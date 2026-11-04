@@ -1,0 +1,1702 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arco in conci</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+  --grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--wash:rgba(11,11,11,.04);
+  --accent:#2a78d6;--s2:#eb6834;--alt:#a9a7a0;
+  --good:#0ca30c;--warn:#fab219;--serious:#ec835a;--crit:#d03b3b;
+  --stone:#ece7dc;--stone-sel:#e0d6c0;--stone-edge:#a59d8c;--abut:#dcd9d1;
+  --div-mid:#f0efec;--neg:#184f95;--pos:#b0302f;
+  --seq:#eef4fc,#cde2fb,#9ec5f4,#6da7ec,#3987e5,#256abf,#184f95,#0d366b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--wash:rgba(255,255,255,.05);
+    --accent:#3987e5;--s2:#d95926;--alt:#6b6a65;
+    --stone:#2f2c27;--stone-sel:#453f33;--stone-edge:#6e675a;--abut:#262523;
+    --div-mid:#383835;--neg:#6da7ec;--pos:#e66767;
+    --seq:#1f2632,#14243a,#184f95,#256abf,#3987e5,#6da7ec,#9ec5f4,#cde2fb;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;
+  --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--wash:rgba(255,255,255,.05);
+  --accent:#3987e5;--s2:#d95926;--alt:#6b6a65;
+  --stone:#2f2c27;--stone-sel:#453f33;--stone-edge:#6e675a;--abut:#262523;
+  --div-mid:#383835;--neg:#6da7ec;--pos:#e66767;
+  --seq:#1f2632,#14243a,#184f95,#256abf,#3987e5,#6da7ec,#9ec5f4,#cde2fb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:14px 20px 10px;display:flex;gap:6px 18px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+h1{font-size:18px;margin:0;font-weight:650;letter-spacing:-.01em}
+.sub{color:var(--ink2);font-size:13px}
+#status{margin-left:auto;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;padding:16px 20px 40px;max-width:1700px;margin:0 auto}
+@media (max-width:960px){.layout{grid-template-columns:1fr;padding:12px 16px 40px}#status{margin-left:0}}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:0}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:0 0 8px;font-weight:650}
+.card h3{font-size:15px;margin:0;font-weight:650}
+.row{display:grid;grid-template-columns:96px minmax(0,1fr) 66px;align-items:center;gap:8px;margin:6px 0}
+.row.two{grid-template-columns:minmax(0,1fr) 92px}
+.row label{color:var(--ink2);font-size:13px}
+.row output{font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
+.unit{color:var(--muted);font-size:12px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+input[type=number],select{width:100%;font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--ink)}
+input[type=number]{font-variant-numeric:tabular-nums}
+.chk{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink2);margin:4px 0;cursor:pointer}
+.chk input{accent-color:var(--accent);margin:0}
+button{font:inherit;font-size:13px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--ink);cursor:pointer}
+button:hover{background:var(--wash)}
+button.primary{background:var(--accent);color:#fff;border-color:transparent}
+button:disabled{opacity:.45;cursor:default}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.4}
+.dis{opacity:.42;pointer-events:none}
+.info{font-size:12px;color:var(--ink2);display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-top:6px;font-variant-numeric:tabular-nums}
+.cardhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin-bottom:6px}
+.linename{font-size:13px;color:var(--ink2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink2);margin:4px 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{display:inline-block;width:18px;height:0;border-top:3px solid}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:8px}
+.toolbar .chk{margin:0}
+.toolbar select{width:auto}
+.msg{padding:10px 12px;border-radius:8px;background:var(--wash);color:var(--ink);font-size:13px;margin:6px 0}
+.msg.crit{border-left:3px solid var(--crit)}
+canvas{display:block;width:100%;touch-action:manipulation}
+#cvArch{cursor:pointer}
+.vwrap{display:grid;grid-template-columns:1fr;gap:12px}
+.vwrap.cmp{grid-template-columns:1fr 1fr}
+@media (max-width:1100px){.vwrap.cmp{grid-template-columns:1fr}}
+.vlabel{font-size:12px;color:var(--ink2);margin:0 0 4px;font-weight:600}
+.cbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);margin:6px 0 0;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.cbar .grad{width:180px;height:10px;border-radius:3px;border:1px solid var(--border)}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:10px}
+.tile{border:1px solid var(--border);border-radius:8px;padding:7px 10px;background:var(--bg)}
+.tile .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tile .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.flag{display:inline-flex;gap:4px;align-items:center;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:-4px -14px 12px;padding:0 10px;overflow-x:auto}
+.tabs button{border:none;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 10px;color:var(--ink2);white-space:nowrap}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.pane{display:none}.pane.on{display:block}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{color:var(--ink2);font-weight:600;font-size:12px;position:sticky;top:0;background:var(--surface)}
+td:first-child,th:first-child{text-align:left}
+td.st{text-align:left}
+tr.selj td{background:var(--wash)}
+.charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+@media (max-width:520px){.charts{grid-template-columns:1fr}}
+.chart h4{margin:0 0 2px;font-size:13px;font-weight:600}
+.chart .cap{font-size:12px;color:var(--muted);margin:0 0 4px}
+.ok{color:var(--good)}.bad{color:var(--crit)}.wr{color:var(--ink2)}
+.checks td,.checks th{text-align:left}
+.prose{max-width:820px;font-size:14px;color:var(--ink)}
+.prose li{margin:4px 0}
+#tip{position:fixed;pointer-events:none;z-index:10;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;font-variant-numeric:tabular-nums;max-width:280px}
+#tip b{font-weight:600}
+.vnav{display:inline-flex;gap:4px;align-items:center}
+.vnav button{padding:2px 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Arco in conci · percorso tensionale</h1>
+  <span class="sub">Heyman e modelli deformabili · sisma statico equivalente λ verso sinistra</span>
+  <span id="status"></span>
+</header>
+
+<div class="layout">
+<aside>
+  <div class="card">
+    <h2>Geometria</h2>
+    <div class="row"><label for="p_theta0">θ₀ apertura</label><input type="range" id="p_theta0" min="60" max="180" step="1" value="180"><output id="o_theta0"></output></div>
+    <div class="row"><label for="p_hR">h/R</label><input type="range" id="p_hR" min="0.08" max="0.30" step="0.0025" value="0.15"><output id="o_hR"></output></div>
+    <div class="row"><label for="p_n">n conci</label><input type="range" id="p_n" min="3" max="60" step="1" value="7"><output id="o_n"></output></div>
+    <div class="row two"><label for="p_R">R raggio medio <span class="unit">[m]</span></label><input type="number" id="p_R" value="3" min="0.2" step="0.1"></div>
+    <div class="row two"><label for="p_gamma">γ peso specifico <span class="unit">[kN/m³]</span></label><input type="number" id="p_gamma" value="21" min="1" step="0.5"></div>
+    <div class="info" id="geoInfo"></div>
+  </div>
+
+  <div class="card">
+    <h2>Azione sismica</h2>
+    <div class="row"><label for="p_frac" id="l_frac">λ / λc</label><input type="range" id="p_frac" min="0" max="1" step="0.005" value="0.5"><output id="o_frac"></output></div>
+    <div class="info" id="lamInfo"></div>
+    <div class="toolbar"><button id="btnAnim">▶ Anima 0 → λc</button></div>
+    <p class="note">Pᵢ = (−λWᵢ, −Wᵢ) applicata nel baricentro esatto Gᵢ di ogni concio.</p>
+  </div>
+
+  <div class="card">
+    <h2>Modello</h2>
+    <select id="p_model">
+      <option value="hc">Heyman · linea al λc (unica)</option>
+      <option value="hs">Heyman · linea più centrata (λ fissato)</option>
+      <option value="uj" selected>Conci rigidi + giunti deformabili (min U*)</option>
+      <option value="ub">Conci e giunti deformabili (min U*, rapporto α)</option>
+    </select>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="p_muOn"> attrito di Coulomb finito</label>
+    <div class="row two" id="r_mu"><label for="p_mu">μ</label><input type="number" id="p_mu" value="0.6" min="0.05" step="0.05"></div>
+    <p class="note" id="modelNote"></p>
+  </div>
+
+  <div class="card" id="c_def">
+    <h2>Deformabilità</h2>
+    <div class="row two"><label for="p_Em">Em malta <span class="unit">[GPa]</span></label><input type="number" id="p_Em" value="2" min="0.01" step="0.1"></div>
+    <div class="row two"><label for="p_tg">tg spessore giunto <span class="unit">[mm]</span></label><input type="number" id="p_tg" value="10" min="0.1" step="1"></div>
+    <div class="row two"><label for="p_Eb">Eb pietra <span class="unit">[GPa]</span></label><input type="number" id="p_Eb" value="30" min="0.1" step="1"></div>
+    <div class="row two"><label for="p_nu">ν pietra</label><input type="number" id="p_nu" value="0.2" min="0" max="0.45" step="0.05"></div>
+    <div class="info" id="defInfo"></div>
+    <p class="note">Eb e ν servono sempre al FEM del concio; nel min U* entrano solo col modello «conci e giunti deformabili».</p>
+  </div>
+
+  <div class="card" id="c_abut">
+    <h2>Spalle</h2>
+    <select id="p_abut">
+      <option value="rigid">rigide</option>
+      <option value="spring">cedevoli (molle kx, ky, kφ)</option>
+      <option value="settle">cedimento imposto della spalla destra</option>
+    </select>
+    <div id="g_spring">
+      <div class="row two"><label for="p_kx">kx <span class="unit">[MN/m per m]</span></label><input type="number" id="p_kx" value="200" min="0.1" step="10"></div>
+      <div class="row two"><label for="p_ky">ky <span class="unit">[MN/m per m]</span></label><input type="number" id="p_ky" value="2000" min="0.1" step="100"></div>
+      <div class="row two"><label for="p_kphi">kφ <span class="unit">[MNm/rad per m]</span></label><input type="number" id="p_kphi" value="50" min="0.01" step="5"></div>
+    </div>
+    <div id="g_settle">
+      <div class="row two"><label for="p_dx">Δx allargamento <span class="unit">[mm]</span></label><input type="number" id="p_dx" value="0.2" step="0.05"></div>
+      <div class="row two"><label for="p_dy">Δy abbassamento <span class="unit">[mm]</span></label><input type="number" id="p_dy" value="0" step="0.05"></div>
+      <div class="row two"><label for="p_dphi">Δφ rotazione <span class="unit">[mrad, antiorario]</span></label><input type="number" id="p_dphi" value="0" step="0.05"></div>
+    </div>
+    <p class="note">Valgono solo nei modelli deformabili (Π* = U* − Lc*). Con Heyman la spalla è rigida per ipotesi.</p>
+  </div>
+
+  <div class="card">
+    <h2>Resistenze (solo controlli)</h2>
+    <div class="row two"><label for="p_fm">fm compressione <span class="unit">[MPa]</span></label><input type="number" id="p_fm" value="6" min="0.1" step="0.5"></div>
+    <div class="row two"><label for="p_ft">ft trazione pietra <span class="unit">[MPa]</span></label><input type="number" id="p_ft" value="0.3" min="0.01" step="0.05"></div>
+  </div>
+</aside>
+
+<main>
+  <section class="card">
+    <div class="cardhead"><h3>Vista arco</h3><span class="linename" id="lineName"></span></div>
+    <div class="legend">
+      <span><i class="sw" style="border-color:var(--accent)"></i>linea delle pressioni</span>
+      <span id="lg_alt"><i class="sw" style="border-color:var(--alt);border-top-width:1.5px"></i>altre linee ammissibili</span>
+      <span id="lg_A" hidden><i class="sw" style="border-color:var(--s2);border-top-style:dashed"></i>stato A</span>
+      <span><i class="dot" style="background:var(--good)"></i>giunto tutto compresso</span>
+      <span><i class="dot" style="background:var(--warn)"></i>parzializzato</span>
+      <span><i class="dot" style="background:var(--surface);box-shadow:inset 0 0 0 2.5px var(--crit)"></i>cerniera</span>
+      <span><i class="dot" style="background:var(--serious)"></i>scorrimento</span>
+    </div>
+    <div id="archMsg"></div>
+    <canvas id="cvArch" height="420" aria-label="Arco con linea delle pressioni"></canvas>
+    <div class="toolbar">
+      <label class="chk"><input type="checkbox" id="v_alt" checked> altre linee ammissibili</label>
+      <label class="chk"><input type="checkbox" id="v_sig" checked> σ sui giunti</label>
+      <label class="chk"><input type="checkbox" id="v_res"> risultanti R</label>
+      <label class="chk"><input type="checkbox" id="v_def" checked> deformata / cinematismo</label>
+      <label class="chk"><input type="checkbox" id="v_anim"> anima</label>
+      <span class="chk">ampl. <input type="range" id="v_amp" min="-1" max="1" step="0.05" value="0" style="width:110px"> <span id="o_amp" class="unit"></span></span>
+    </div>
+    <p class="note">Clicca un concio per aprirlo nella vista concio. Passa sopra un giunto per leggerne N, M, e.</p>
+  </section>
+
+  <section class="card">
+    <div class="cardhead">
+      <h3>Vista concio <span class="vnav"><button id="vPrev" aria-label="concio precedente">◀</button><span id="vName">—</span><button id="vNext" aria-label="concio successivo">▶</button></span></h3>
+      <span class="linename" id="vInfo"></span>
+    </div>
+    <div class="toolbar" style="margin-top:0">
+      <select id="v_method" aria-label="metodo">
+        <option value="fem">FEM 2D stato piano (cap. 6.2)</option>
+        <option value="winkler">Trave curva · Winkler (cap. 6.1)</option>
+        <option value="navier">Trave · Navier (cap. 6.1)</option>
+      </select>
+      <select id="v_map" aria-label="mappa">
+        <option value="s2">mappa σ₂ (compressione principale)</option>
+        <option value="s1">mappa σ₁ (trazione principale)</option>
+        <option value="stt">mappa σ tangenziale (lungo l'asse)</option>
+        <option value="tau">mappa τ</option>
+      </select>
+      <select id="v_mesh" aria-label="mesh">
+        <option value="10">mesh grossa</option>
+        <option value="18" selected>mesh media</option>
+        <option value="28">mesh fine</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="v_iso" checked> isostatiche σ₂</label>
+      <label class="chk"><input type="checkbox" id="v_tens" checked> zone tese</label>
+      <label class="chk"><input type="checkbox" id="v_grid"> mesh</label>
+      <button id="btnSnap">📌 Fissa come stato A</button>
+      <button id="btnUnsnap" hidden>✕ Togli A</button>
+    </div>
+    <div class="vwrap" id="vwrap">
+      <div id="vBox"><p class="vlabel" id="vLabB">Stato corrente</p><canvas id="cvV" height="300" aria-label="Campo di tensione nel concio"></canvas></div>
+      <div id="vBoxA" hidden><p class="vlabel" id="vLabA">Stato A</p><canvas id="cvVA" height="300" aria-label="Campo di tensione nel concio, stato A"></canvas></div>
+    </div>
+    <div class="cbar" id="cbar"></div>
+    <div class="stats" id="vStats"></div>
+    <p class="note">Linea blu dentro il concio: linea delle pressioni (equilibrio, cap. 6.1). Punti arancio: risultante del campo calcolato su tagli radiali; devono stare sulla linea. Le isostatiche sono seminate a flusso costante sulla sezione di mezzeria: dove si addensano, la compressione si concentra.</p>
+  </section>
+
+  <section class="card">
+    <div class="tabs" role="tablist">
+      <button class="on" data-tab="t_tab">Tabella giunti</button>
+      <button data-tab="t_chart">Grafici in λ</button>
+      <button data-tab="t_chk">Controlli numerici</button>
+      <button data-tab="t_val">Validazione cap. 4</button>
+      <button data-tab="t_lim">Limiti e lettura</button>
+    </div>
+    <div class="pane on" id="t_tab"><div class="tablewrap" id="jointTable"></div></div>
+    <div class="pane" id="t_chart">
+      <div class="toolbar" style="margin:0 0 10px"><button class="primary" id="btnSweep">Calcola andamento in λ</button><span class="note" id="sweepNote" style="margin:0">Risolve il modello scelto per λ/λc da 0 a 0,99 e il FEM di tutti i conci (mesh grossa).</span></div>
+      <div class="charts" id="charts"></div>
+    </div>
+    <div class="pane" id="t_chk"><div id="checks"></div></div>
+    <div class="pane" id="t_val">
+      <div class="toolbar" style="margin:0 0 10px"><button class="primary" id="btnVal">Esegui validazione</button><span class="note" style="margin:0">Confronta con i numeri della tesina (h/R = 0,15, n = 7, R = γ = 1).</span></div>
+      <div id="valOut"></div>
+    </div>
+    <div class="pane" id="t_lim">
+      <div class="prose">
+        <p><b>Come leggere il programma.</b></p>
+        <ul>
+          <li><b>Heyman, linea al λc</b>: l'unica linea equilibrata e contenuta nello spessore al moltiplicatore di collasso (teorema statico come LP). Tocca i lembi in 4 giunti alternati: le cerniere. La deformata disegnata è il <i>cinematismo</i> a 3 blocchi, e il λ cinematico dal PLV deve coincidere con λc.</li>
+          <li><b>Heyman, linea più centrata</b>: per λ &lt; λc le linee ammissibili sono infinite (in grigio un campione di vertici, comprese la spinta minima e massima). Si sceglie quella con il massimo margine s dai lembi: |M| + s ≤ N·h/2.</li>
+          <li><b>Min U*</b>: con i giunti di malta deformabili e non reagenti a trazione ogni linea ha un'energia diversa; quella vera è la minima (Menabrea generalizzato). Le cerniere nascono da sole quando |e| → h/2, perché lì u* → ∞. La deformata mostra davvero come si apre ogni giunto.</li>
+          <li><b>Conci deformabili</b>: si aggiunge l'energia della trave curva. Il rapporto α = (Eb/Em)·tg/(RΔθ) dice chi comanda: α grande → giunti (modello precedente); α piccolo → arco elastico monolitico.</li>
+          <li><b>Vista concio</b>: il FEM vede la diffusione della forza (De Saint-Venant, zona lunga circa h) e le trazioni di splitting trasversali quando il contatto è concentrato vicino a una cerniera. Le tensioni dipendono poco da Eb e ν: con carichi assegnati sul contorno il campo è quello del problema di Airy.</li>
+        </ul>
+        <p><b>Limiti da tenere a mente.</b></p>
+        <ul>
+          <li>Il sisma è statico equivalente: niente dinamica e niente rocking.</li>
+          <li>Non ci sono i rinfianchi né il riempimento.</li>
+          <li>La soluzione elastica (min U*) è fragile: un cedimento di pochi decimi di millimetro sposta tutta la linea e fa nascere cerniere. Per la sicurezza conta il teorema statico, che vale per qualunque stato iniziale.</li>
+          <li>Con μ finito la legge di scorrimento è non associata: il λ statico è una stima, i teoremi non valgono in senso stretto. Nei modelli deformabili lo scorrimento è solo segnalato, non imposto.</li>
+          <li>Le distribuzioni lineari o triangolari sulle facce sono un'ipotesi (giunto sottile ed elastico); il taglio è preso proporzionale a σ, τ = (T/N)·σ.</li>
+          <li>Vicino ai lembi di una cerniera le tensioni sono teoricamente infinite (carico concentrato): il valore del FEM dipende dalla mesh e va letto come indicatore. In realtà lì il materiale si plasticizza o si sbriciola.</li>
+          <li>La resistenza a compressione finita (cap. 5.4) non entra nel calcolo della linea: σmax è solo confrontata con fm.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+<div id="tip"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   NUCLEO DI CALCOLO
+   Unità interne: m, kN (per metro di profondità), kPa.
+   Convenzioni del file di contesto: φ dalla verticale, t = (cosφ, −senφ),
+   r = (senφ, cosφ) verso l'estradosso, N > 0 compressione, e = −M/N.
+   ===================================================================== */
+const D2R = Math.PI / 180, LMAX = 50, LAMBDA_NO_MECH = 3;
+
+function rGsector(R, h, d) { const k = R + h * h / (12 * R); return d < 1e-10 ? k : k * Math.sin(d / 2) / (d / 2); }
+
+// forma lineare f = [aH, aV, aM, aλ, c]  →  aH·H0 + aV·V0 + aM·M0 + aλ·λ + c
+const ev = (f, x) => f[0] * x[0] + f[1] * x[1] + f[2] * x[2] + f[3] * x[3] + f[4];
+const comb = (a, ca, b, cb) => a.map((v, i) => ca * v + cb * b[i]);
+
+function makeGeom(p) {
+  const R = p.R, h = p.hR * p.R, th0 = p.theta0 * D2R, n = p.n, gam = p.gamma, dth = th0 / n;
+  const phi = [], C = [], t = [], r = [];
+  for (let j = 0; j <= n; j++) {
+    const f = -th0 / 2 + j * dth;
+    phi.push(f); C.push([R * Math.sin(f), R * Math.cos(f)]);
+    t.push([Math.cos(f), -Math.sin(f)]); r.push([Math.sin(f), Math.cos(f)]);
+  }
+  const W = gam * R * h * dth, rg = rGsector(R, h, dth), G = [null], psi = [null];
+  for (let i = 1; i <= n; i++) { const s = -th0 / 2 + (i - 0.5) * dth; psi.push(s); G.push([rg * Math.sin(s), rg * Math.cos(s)]); }
+  const g = { R, h, th0, n, gam, dth, phi, C, t, r, W, G, psi, Wtot: W * n,
+    luce: 2 * R * Math.sin(th0 / 2), freccia: R * (1 - Math.cos(th0 / 2)) };
+  g.J = [];
+  for (let j = 0; j <= n; j++) g.J.push(cutForms(g, j, 0));
+  return g;
+}
+
+// Sollecitazioni su un taglio radiale: k conci interi a sinistra + porzione di angolo delta del concio k+1.
+// Cascata del cap. 2 (con delta = 0 è il giunto k(k+1)).
+function cutForms(g, k, delta) {
+  const ph = g.phi[k] + delta, s = Math.sin(ph), c = Math.cos(ph);
+  const Cc = [g.R * s, g.R * c], tc = [c, -s], rc = [s, c], C0 = g.C[0];
+  const M = [-(C0[1] - Cc[1]), C0[0] - Cc[0], 1, 0, 0];
+  let SW = 0;
+  const add = (w, G) => { SW += w; M[3] += w * (G[1] - Cc[1]); M[4] -= w * (G[0] - Cc[0]); };
+  for (let i = 1; i <= k; i++) add(g.W, g.G[i]);
+  if (delta > 1e-13) {
+    const rr = rGsector(g.R, g.h, delta), m = g.phi[k] + delta / 2;
+    add(g.gam * g.R * g.h * delta, [rr * Math.sin(m), rr * Math.cos(m)]);
+  }
+  const Rx = [1, 0, 0, -SW, 0], Ry = [0, 1, 0, 0, -SW];
+  return { phi: ph, C: Cc, t: tc, r: rc, SW, Rx, Ry, M, N: comb(Rx, tc[0], Ry, tc[1]), T: comb(Rx, rc[0], Ry, rc[1]) };
+}
+const cutInVoussoir = (g, i, u) => cutForms(g, i - 1, u * g.dth);
+
+/* ---------- simplesso a due fasi: max c·x, A x ≤ b, free[j] = variabile libera ---------- */
+function simplex(c, A, b, free) {
+  const m = A.length, n = c.length, EPS = 1e-10;
+  const col = []; let nx = 0;
+  for (let j = 0; j < n; j++) { const a = nx++; const bb = free[j] ? nx++ : -1; col.push([a, bb]); }
+  const neg = b.map(v => v < 0), nart = neg.reduce((s, v) => s + (v ? 1 : 0), 0);
+  const nc = nx + m + nart, W = nc + 1, T = new Array(m), basis = new Int32Array(m);
+  let ia = 0;
+  for (let i = 0; i < m; i++) {
+    const row = new Float64Array(W), s = neg[i] ? -1 : 1;
+    for (let j = 0; j < n; j++) { const v = s * A[i][j]; row[col[j][0]] = v; if (col[j][1] >= 0) row[col[j][1]] = -v; }
+    row[nx + i] = s; row[nc] = s * b[i];
+    if (neg[i]) { row[nx + m + ia] = 1; basis[i] = nx + m + ia; ia++; } else basis[i] = nx + i;
+    T[i] = row;
+  }
+  const allowed = new Uint8Array(nc).fill(1);
+  const pivot = (l, e, z) => {
+    const pr = T[l], pv = pr[e];
+    for (let j = 0; j < W; j++) pr[j] /= pv;
+    for (let i = 0; i < m; i++) {
+      if (i === l) continue;
+      const row = T[i], f = row[e];
+      if (f !== 0) for (let j = 0; j < W; j++) row[j] -= f * pr[j];
+    }
+    const f = z[e]; if (f !== 0) for (let j = 0; j < W; j++) z[j] -= f * pr[j];
+    basis[l] = e;
+  };
+  const run = cost => {
+    const z = new Float64Array(W);
+    for (let j = 0; j < nc; j++) z[j] = -cost[j];
+    for (let i = 0; i < m; i++) { const cb = cost[basis[i]]; if (cb !== 0) { const row = T[i]; for (let j = 0; j < W; j++) z[j] += cb * row[j]; } }
+    let degen = 0;
+    for (let it = 0; it < 50000; it++) {
+      let e = -1;
+      if (degen > 25) { for (let j = 0; j < nc; j++) if (allowed[j] && z[j] < -EPS) { e = j; break; } }
+      else { let best = -EPS; for (let j = 0; j < nc; j++) if (allowed[j] && z[j] < best) { best = z[j]; e = j; } }
+      if (e < 0) return { st: 'opt', z };
+      let l = -1, best = Infinity;
+      for (let i = 0; i < m; i++) {
+        const v = T[i][e];
+        if (v > EPS) { const q = T[i][nc] / v; if (q < best - 1e-13 || (q <= best + 1e-13 && l >= 0 && basis[i] < basis[l])) { best = q; l = i; } }
+      }
+      if (l < 0) return { st: 'unb' };
+      degen = best < 1e-12 ? degen + 1 : 0;
+      pivot(l, e, z);
+    }
+    return { st: 'iter' };
+  };
+  if (nart > 0) {
+    const cost = new Float64Array(nc); for (let j = nx + m; j < nc; j++) cost[j] = -1;
+    const r = run(cost); if (r.st !== 'opt') return { status: 'error' };
+    let bmax = 1; for (const v of b) bmax = Math.max(bmax, Math.abs(v));
+    if (r.z[nc] < -1e-9 * bmax) return { status: 'infeasible' };
+    const dummy = new Float64Array(W);
+    for (let i = 0; i < m; i++) if (basis[i] >= nx + m) {
+      let e = -1; for (let j = 0; j < nx + m; j++) if (Math.abs(T[i][j]) > 1e-9) { e = j; break; }
+      if (e >= 0) pivot(i, e, dummy);
+    }
+    for (let j = nx + m; j < nc; j++) allowed[j] = 0;
+  }
+  const cost = new Float64Array(nc);
+  for (let j = 0; j < n; j++) { cost[col[j][0]] = c[j]; if (col[j][1] >= 0) cost[col[j][1]] = -c[j]; }
+  const r = run(cost);
+  if (r.st === 'unb') return { status: 'unbounded' };
+  if (r.st !== 'opt') return { status: 'error' };
+  const val = new Float64Array(nc); for (let i = 0; i < m; i++) val[basis[i]] = T[i][nc];
+  return { status: 'optimal', x: c.map((_, j) => val[col[j][0]] - (col[j][1] >= 0 ? val[col[j][1]] : 0)), obj: r.z[nc] };
+}
+
+/* ---------- teorema statico: max λ ---------- */
+function lpLambdaC(g, mu) {
+  const A = [], b = [], hh = g.h / 2;
+  const push = f => { A.push([f[0], f[1], f[2], f[3]]); b.push(-f[4]); };
+  for (const J of g.J) {
+    push(comb(J.M, 1, J.N, -hh)); push(comb(J.M, -1, J.N, -hh));
+    if (mu != null) { push(comb(J.T, 1, J.N, -mu)); push(comb(J.T, -1, J.N, -mu)); }
+  }
+  A.push([0, 0, 0, 1]); b.push(LMAX);
+  const res = simplex([0, 0, 0, 1], A, b, [1, 1, 1, 0]);
+  if (res.status === 'infeasible') return { status: 'infeasible' };
+  if (res.status !== 'optimal') return { status: 'error' };
+  if (res.x[3] >= LMAX * (1 - 1e-9)) return { status: 'unbounded', lam: Infinity, x: res.x };
+  return { status: 'ok', lam: res.x[3], x: res.x };
+}
+
+/* ---------- LP a λ fissato: 'center' = max s con |M| + s ≤ N h/2 ; 'dir' = max d·(H0,V0,M0) ---------- */
+function lpFixed(g, lam, mu, mode, dir) {
+  const A = [], b = [], hh = g.h / 2, S = mode === 'center';
+  const push = (f, sc) => { const row = [f[0], f[1], f[2]]; if (S) row.push(sc); A.push(row); b.push(-(f[3] * lam + f[4])); };
+  for (const J of g.J) {
+    push(comb(J.M, 1, J.N, -hh), 1); push(comb(J.M, -1, J.N, -hh), 1);
+    if (mu != null) { push(comb(J.T, 1, J.N, -mu), 0); push(comb(J.T, -1, J.N, -mu), 0); }
+  }
+  const B = 1e3 * g.Wtot, bounds = [B, B, B * g.R];
+  for (let k = 0; k < 3; k++) {
+    const row = S ? [0, 0, 0, 0] : [0, 0, 0]; row[k] = 1;
+    A.push(row.slice()); b.push(bounds[k]); row[k] = -1; A.push(row); b.push(bounds[k]);
+  }
+  const res = simplex(S ? [0, 0, 0, 1] : dir, A, b, S ? [1, 1, 1, 0] : [1, 1, 1]);
+  if (res.status !== 'optimal') return null;
+  return { x: [res.x[0], res.x[1], res.x[2], lam], s: S ? res.x[3] : 0 };
+}
+
+/* ---------- energia complementare del giunto (cap. 5.1): [u, uN, uM, uNN, uNM, uMM] ---------- */
+function ustarJoint(N, M, h, k) {
+  if (!(N > 0)) return null;
+  const m = Math.abs(M), s = M >= 0 ? 1 : -1;
+  if (m <= N * h / 6) return [k * (N * N + 12 * M * M / (h * h)) / (2 * h), k * N / h, 12 * k * M / (h * h * h), k / h, 0, 12 * k / (h * h * h)];
+  const D = N * h / 2 - m; if (D <= 0) return null;
+  const c = 2 * k / 9, D2 = D * D, D3 = D2 * D, N2 = N * N, N3 = N2 * N;
+  return [c * N3 / D, c * (3 * N2 / D - h / 2 * N3 / D2), c * s * N3 / D2,
+    c * (6 * N / D - 3 * N2 * h / D2 + N3 * h * h / (2 * D3)), c * s * (3 * N2 / D2 - h * N3 / D3), 2 * c * N3 / D3];
+}
+
+function buildEnergy(g, P, lam) {
+  const k = P.tg / P.Em;
+  const aff = f => ({ a: [f[0], f[1], f[2]], c: f[3] * lam + f[4] });
+  const joints = g.J.map(J => ({ N: aff(J.N), M: aff(J.M) }));
+  const quads = [], gauss = [];
+  if (P.blocks) {
+    const GP = [-0.8611363115940526, -0.3399810435848563, 0.3399810435848563, 0.8611363115940526];
+    const GW = [0.3478548451374538, 0.6521451548625461, 0.6521451548625461, 0.3478548451374538];
+    const A = g.h, I = g.h ** 3 / 12;
+    for (let i = 1; i <= g.n; i++) for (let q = 0; q < 4; q++) {
+      const cf = cutInVoussoir(g, i, (1 + GP[q]) / 2), ds = g.R * g.dth * GW[q] / 2;
+      const it = { cf, cN: ds / (P.Eb * A), cM: ds / (P.Eb * I), N: aff(cf.N), M: aff(cf.M) };
+      gauss.push(it); quads.push({ q: it.N, c: it.cN }, { q: it.M, c: it.cM });
+    }
+  }
+  const Jn = g.J[g.n];
+  if (P.abut === 'spring') {
+    const cx = 1 / P.kx, cy = 1 / P.ky, cp = 1 / P.kphi;
+    quads.push({ q: aff([1, 0, 0, 0, 0]), c: cx }, { q: aff([0, 1, 0, 0, 0]), c: cy }, { q: aff([0, 0, 1, 0, 0]), c: cp },
+      { q: aff(Jn.Rx), c: cx }, { q: aff(Jn.Ry), c: cy }, { q: aff(Jn.M), c: cp });
+  }
+  // Π* = U* − Lc*,  Lc* = (−R)·Δ + (−M)·Δφ  (reazioni della spalla destra sull'arco)
+  let lin = { a: [0, 0, 0], c: 0 };
+  if (P.abut === 'settle') lin = aff(comb(comb(Jn.Rx, P.dx, Jn.Ry, P.dy), 1, Jn.M, P.dphi));
+  const val = (q, y) => q.a[0] * y[0] + q.a[1] * y[1] + q.a[2] * y[2] + q.c;
+  function F(y, wantD) {
+    let U = 0; const gr = [0, 0, 0], H = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (const jt of joints) {
+      const u = ustarJoint(val(jt.N, y), val(jt.M, y), g.h, k); if (!u) return null;
+      U += u[0];
+      if (wantD) {
+        const aN = jt.N.a, aM = jt.M.a;
+        for (let r = 0; r < 3; r++) {
+          gr[r] += u[1] * aN[r] + u[2] * aM[r];
+          for (let s = 0; s < 3; s++) H[r][s] += u[3] * aN[r] * aN[s] + u[4] * (aN[r] * aM[s] + aM[r] * aN[s]) + u[5] * aM[r] * aM[s];
+        }
+      }
+    }
+    for (const qd of quads) {
+      const v = val(qd.q, y); U += qd.c * v * v / 2;
+      if (wantD) { const a = qd.q.a; for (let r = 0; r < 3; r++) { gr[r] += qd.c * v * a[r]; for (let s = 0; s < 3; s++) H[r][s] += qd.c * a[r] * a[s]; } }
+    }
+    const L = val(lin, y);
+    if (wantD) for (let r = 0; r < 3; r++) gr[r] += lin.a[r];
+    return { f: U + L, U, g: gr, H };
+  }
+  return { F, k, gauss, P };
+}
+
+function solve3(H, b) {
+  const A = H.map((r, i) => [r[0], r[1], r[2], b[i]]);
+  for (let c = 0; c < 3; c++) {
+    let p = c; for (let r = c + 1; r < 3; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    if (!(Math.abs(A[p][c]) > 0)) return null;
+    [A[c], A[p]] = [A[p], A[c]];
+    for (let r = 0; r < 3; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let q = c; q < 4; q++) A[r][q] -= f * A[c][q]; }
+  }
+  return [A[0][3] / A[0][0], A[1][3] / A[1][1], A[2][3] / A[2][2]];
+}
+
+// Newton smorzato con ricerca lineare che resta nel dominio ammissibile (u* = ∞ fuori).
+function minimizeU(E, y0) {
+  let y = y0.slice(), cur = E.F(y, true);
+  if (!cur) return { ok: false, msg: 'punto di partenza non ammissibile' };
+  let it = 0;
+  for (; it < 200; it++) {
+    let d = solve3(cur.H, cur.g.map(v => -v));
+    let gd = d ? cur.g[0] * d[0] + cur.g[1] * d[1] + cur.g[2] * d[2] : 0;
+    if (!d || !(gd < 0)) {
+      const Hd = [Math.abs(cur.H[0][0]) || 1, Math.abs(cur.H[1][1]) || 1, Math.abs(cur.H[2][2]) || 1];
+      d = cur.g.map((v, i) => -v / Hd[i]); gd = cur.g[0] * d[0] + cur.g[1] * d[1] + cur.g[2] * d[2];
+    }
+    if (-gd < 1e-15 * Math.abs(cur.U) + 1e-300) break;
+    let a = 1, nxt = null, tr = null;
+    for (let ls = 0; ls < 80; ls++) {
+      const yt = [y[0] + a * d[0], y[1] + a * d[1], y[2] + a * d[2]];
+      tr = E.F(yt, false);
+      if (tr && tr.f <= cur.f + 1e-4 * a * gd) { nxt = yt; break; }
+      a /= 2;
+    }
+    if (!nxt) break;
+    y = nxt; cur = E.F(y, true);
+  }
+  return { ok: true, y, it, f: cur.f, U: cur.U, grad: cur.g };
+}
+
+/* ---------- distribuzione di contatto sul giunto (cap. 5.1) ---------- */
+function contact(N, M, h) {
+  if (!(N > 0)) return { ok: false };
+  const e = -M / N, ae = Math.abs(e);
+  if (ae <= h / 6 * (1 + 1e-12)) return { ok: true, e, a: h, trap: true, smax: N / h * (1 + 6 * ae / h) };
+  const a = Math.max(0, 3 * (h / 2 - ae));
+  return { ok: true, e, a, trap: false, smax: a > 1e-12 * h ? 2 * N / a : Infinity };
+}
+function sigmaAt(ct, N, h, y) {
+  if (ct.trap) return N / h * (1 + 12 * ct.e * y / (h * h));
+  if (ct.a <= 0) return 0;
+  const d = ct.e > 0 ? y - (h / 2 - ct.a) : (-h / 2 + ct.a) - y;
+  return d > 0 ? 2 * N / ct.a * d / ct.a : 0;
+}
+
+/* ---------- cinematismo a 3 blocchi tra 4 cerniere (PLV) ---------- */
+const kx_ = v => [-v[1], v[0]];
+function mechanism(g, S) {
+  const hj = []; S.joints.forEach((jr, j) => { if (jr.hinge) hj.push(j); });
+  if (S.joints.some(j => j.slide)) return { ok: false, msg: 'Con scorrimento attivo il meccanismo non è a sole cerniere: cinematica non disegnata.' };
+  if (hj.length !== 4) return { ok: false, msg: `Trovate ${hj.length} cerniere (servono 4 per il meccanismo a 3 blocchi).` };
+  const P = hj.map(j => { const s = Math.sign(S.joints[j].e), C = g.C[j], r = g.r[j]; return [C[0] + s * g.h / 2 * r[0], C[1] + s * g.h / 2 * r[1]]; });
+  const [A, B, Cc, D] = P;
+  const a11 = Cc[0] - B[0], a12 = -(Cc[0] - D[0]), a21 = Cc[1] - B[1], a22 = -(Cc[1] - D[1]);
+  const r1 = -(B[0] - A[0]), r2 = -(B[1] - A[1]), det = a11 * a22 - a12 * a21;
+  if (Math.abs(det) < 1e-14) return { ok: false, msg: 'Cerniere allineate: meccanismo degenere.' };
+  let th = [1, (r1 * a22 - a12 * r2) / det, (a11 * r2 - a21 * r1) / det];
+  const blockOf = i => i <= hj[0] ? 0 : i <= hj[1] ? 1 : i <= hj[2] ? 2 : i <= hj[3] ? 3 : 0;
+  const disp = (Pt, blk) => {
+    if (blk === 1) { const k = kx_([Pt[0] - A[0], Pt[1] - A[1]]); return [th[0] * k[0], th[0] * k[1]]; }
+    if (blk === 2) { const uB = kx_([B[0] - A[0], B[1] - A[1]]).map(v => v * th[0]); const k = kx_([Pt[0] - B[0], Pt[1] - B[1]]); return [uB[0] + th[1] * k[0], uB[1] + th[1] * k[1]]; }
+    if (blk === 3) { const k = kx_([Pt[0] - D[0], Pt[1] - D[1]]); return [th[2] * k[0], th[2] * k[1]]; }
+    return [0, 0];
+  };
+  let Sx = 0, Sy = 0;
+  for (let i = 1; i <= g.n; i++) { const d = disp(g.G[i], blockOf(i)); Sx += g.W * d[0]; Sy += g.W * d[1]; }
+  if (Sx > 0) { th = th.map(v => -v); Sx = -Sx; Sy = -Sy; }   // il meccanismo si muove nel verso del sisma
+  const lamCin = -Sy / Sx;
+  // coerenza: ogni cerniera deve aprire il lembo opposto
+  let coerente = true;
+  for (let q = 0; q < 4; q++) {
+    const j = hj[q], s = Math.sign(S.joints[j].e), C = g.C[j], r = g.r[j];
+    const Q = [C[0] - s * g.h / 2 * r[0], C[1] - s * g.h / 2 * r[1]];
+    const dl = disp(Q, blockOf(j)), dr = disp(Q, blockOf(j + 1));
+    if ((dr[0] - dl[0]) * g.t[j][0] + (dr[1] - dl[1]) * g.t[j][1] < -1e-9) coerente = false;
+  }
+  const uB = kx_([B[0] - A[0], B[1] - A[1]]).map(v => v * th[0]);
+  const O2 = Math.abs(th[1]) > 1e-12 ? [B[0] + kx_(uB)[0] / th[1], B[1] + kx_(uB)[1] / th[1]] : null;
+  return { ok: true, hj, P, th, lamCin, blockOf, disp, coerente, O2, uB };
+}
+
+/* ---------- spostamenti nel modello deformabile (Castigliano sui giunti e sui tratti di concio) ---------- */
+const motionAdd = (st, du, dw, Cp) => ({ u: [st.u[0] + du[0] + dw * Cp[1], st.u[1] + du[1] - dw * Cp[0]], w: st.w + dw });
+const dispAt = (st, P) => [st.u[0] - st.w * P[1], st.u[1] + st.w * P[0]];
+function deformation(g, P, S) {
+  const x = S.x, k = P.tg / P.Em, springs = [];
+  for (let j = 0; j <= g.n; j++) {
+    const J = g.J[j], u = ustarJoint(ev(J.N, x), ev(J.M, x), g.h, k);
+    springs.push({ joint: j, C: J.C, t: J.t, d: u[1], rot: u[2] });
+  }
+  if (P.blocks) for (const gp of S.E.gauss) springs.push({ phi: gp.cf.phi, C: gp.cf.C, t: gp.cf.t, d: gp.cN * ev(gp.cf.N, x), rot: gp.cM * ev(gp.cf.M, x) });
+  let left = { u: [0, 0], w: 0 };
+  if (P.abut === 'spring') left = motionAdd(left, [-x[0] / P.kx, -x[1] / P.ky], -x[2] / P.kphi, g.C[0]);
+  const cross = (st, s) => motionAdd(st, [-s.d * s.t[0], -s.d * s.t[1]], -s.rot, s.C);
+  const stations = [null];
+  const NS = P.blocks ? 10 : 2;
+  for (let i = 1; i <= g.n; i++) {
+    const arr = [];
+    for (let q = 0; q <= NS; q++) {
+      const u = q / NS, ph = g.phi[i - 1] + u * g.dth;
+      let st = left;
+      for (const s of springs) if (s.joint !== undefined ? s.joint <= i - 1 : s.phi < ph) st = cross(st, s);
+      arr.push({ u, st });
+    }
+    stations.push(arr);
+  }
+  let fin = left; for (const s of springs) fin = cross(fin, s);
+  const Jn = g.J[g.n], Cn = g.C[g.n];
+  let pu = [0, 0], pw = 0;
+  if (P.abut === 'spring') { pu = [ev(Jn.Rx, x) / P.kx, ev(Jn.Ry, x) / P.ky]; pw = ev(Jn.M, x) / P.kphi; }
+  if (P.abut === 'settle') { pu = [P.dx, P.dy]; pw = P.dphi; }
+  const uf = dispAt(fin, Cn);
+  let dmax = 1e-30;
+  for (let i = 1; i <= g.n; i++) for (const s of stations[i]) for (const yy of [-g.h / 2, g.h / 2]) {
+    const ph = g.phi[i - 1] + s.u * g.dth, Pt = [(g.R + yy) * Math.sin(ph), (g.R + yy) * Math.cos(ph)];
+    dmax = Math.max(dmax, Math.hypot(...dispAt(s.st, Pt)));
+  }
+  const err = Math.max(Math.hypot(uf[0] - pu[0], uf[1] - pu[1]), Math.abs(fin.w - pw) * g.R);
+  return { stations, dmax, compat: err / Math.max(dmax, Math.hypot(pu[0], pu[1]), 1e-30), springs };
+}
+
+/* ---------- soluzione completa a livello di arco ---------- */
+function internal(p) {
+  return Object.assign({}, p, { blocks: p.model === 'ub', Em: p.Em * 1e6, Eb: p.Eb * 1e6, tg: p.tg / 1000,
+    kx: p.kx * 1e3, ky: p.ky * 1e3, kphi: p.kphi * 1e3, dx: p.dx / 1000, dy: -p.dy / 1000, dphi: p.dphi / 1000,
+    fm: p.fm * 1e3, ft: p.ft * 1e3 });
+}
+let lcCache = { key: null, val: null };
+function getLambdaC(g, p, mu) {
+  const key = [p.theta0, p.hR, p.n, p.R, p.gamma, mu].join('|');
+  if (lcCache.key !== key) lcCache = { key, val: lpLambdaC(g, mu) };
+  return lcCache.val;
+}
+function jointResults(g, x, mu, hingeTol) {
+  return g.J.map(J => {
+    const N = ev(J.N, x), T = ev(J.T, x), M = ev(J.M, x), ct = contact(N, M, g.h);
+    const e = ct.ok ? ct.e : NaN, ratio = e / (g.h / 2);
+    const hinge = ct.ok && Math.abs(ratio) >= hingeTol;
+    const part = ct.ok && Math.abs(e) > g.h / 6 * (1 + 1e-9);
+    const slide = mu != null && ct.ok && Math.abs(T) >= mu * N * (1 - 1e-6);
+    const u = ustarJoint(N, M, g.h, 1);
+    const state = !ct.ok ? 'traz' : hinge ? 'cern' : slide ? 'scorr' : part ? 'parz' : 'comp';
+    return { N, T, M, e, ratio, ct, hinge, part, slide, state, ustar: u ? u[0] : Infinity,
+      Cp: ct.ok ? [J.C[0] + e * J.r[0], J.C[1] + e * J.r[1]] : null };
+  });
+}
+function pressureLine(g, x) {
+  const pts = [];
+  for (let i = 1; i <= g.n; i++) for (let q = (i === 1 ? 0 : 1); q <= 8; q++) {
+    const cf = cutInVoussoir(g, i, q / 8), N = ev(cf.N, x), M = ev(cf.M, x);
+    if (!(N > 0)) { pts.push(null); continue; }
+    const e = -M / N; pts.push([cf.C[0] + e * cf.r[0], cf.C[1] + e * cf.r[1]]);
+  }
+  return pts;
+}
+function altLines(g, lam, mu, count) {
+  const out = [], sc = [g.Wtot, g.Wtot, g.Wtot * g.R];
+  const dirs = [[1, 0, 0], [-1, 0, 0]];
+  let s = 98765; const rnd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648 * 2 - 1; };
+  for (let k = 0; k < count - 2; k++) dirs.push([rnd(), rnd(), rnd()]);
+  dirs.forEach((d, k) => {
+    const r = lpFixed(g, lam, mu, 'dir', d.map((v, i) => v / sc[i]));
+    if (r) out.push({ x: r.x, label: k === 0 ? 'H max' : k === 1 ? 'H min' : '' });
+  });
+  return out;
+}
+
+function solveAll(p, opts = {}) {
+  const g = makeGeom(p), P = internal(p), mu = p.muOn ? p.mu : null;
+  const lc = getLambdaC(g, p, mu);
+  const S = { p, P, g, mu, lc, model: p.model };
+  if (lc.status === 'infeasible') { S.fail = 'Spessore insufficiente: non esiste nessuna linea delle pressioni contenuta nell\'arco nemmeno a λ = 0 (h/R sotto il minimo).'; return S; }
+  if (lc.status === 'error') { S.fail = 'Errore del solutore LP.'; return S; }
+  S.lcFinite = lc.status === 'ok';
+  S.lamRef = S.lcFinite ? lc.lam : LAMBDA_NO_MECH;
+  let lam, x;
+  if (p.model === 'hc') {
+    if (!S.lcFinite) { S.fail = `Nessun meccanismo a cerniere: λc > ${LMAX} (arco tozzo o molto ribassato). Scegli un modello a λ fissato.`; return S; }
+    lam = lc.lam; x = lc.x.slice();
+    S.lineName = 'Heyman · unica linea ammissibile a λ = λc (soluzione del teorema statico)';
+  } else {
+    let fr = p.frac;
+    if (p.model !== 'hs' && S.lcFinite) fr = Math.min(fr, 0.995);
+    lam = fr * S.lamRef;
+    const cen = lpFixed(g, lam, mu, 'center');
+    if (!cen || cen.s < -1e-12) { S.fail = 'Nessuna linea ammissibile a questo λ.'; return S; }
+    S.center = cen;
+    if (p.model === 'hs') { x = cen.x; S.lineName = 'Heyman · linea «più centrata»: max s con |M| + s ≤ N·h/2 (LP a λ fissato)'; }
+    else {
+      if (cen.s <= 1e-10 * g.Wtot * g.R) { S.fail = 'Il dominio ammissibile non ha interno (λ ≈ λc): il minimo di U* coincide con la linea di Heyman.'; return S; }
+      const E = buildEnergy(g, P, lam), mres = minimizeU(E, cen.x.slice(0, 3));
+      if (!mres.ok) { S.fail = 'Minimo di U* non trovato: ' + mres.msg; return S; }
+      x = [mres.y[0], mres.y[1], mres.y[2], lam]; S.E = E; S.min = mres;
+      S.lineName = P.blocks ? 'Deformabile · minimo di Π* con conci (trave curva) e giunti elastici non reagenti a trazione'
+        : 'Conci rigidi + giunti di malta · minimo di Π* (Menabrea generalizzato)';
+      if (p.abut === 'settle') S.lineName += ' · con cedimento imposto';
+      if (p.abut === 'spring') S.lineName += ' · spalle cedevoli';
+    }
+  }
+  S.lam = lam; S.x = x;
+  const deformable = p.model === 'uj' || p.model === 'ub';
+  S.hingeTol = deformable ? 0.95 : 1 - 1e-6;
+  S.joints = jointResults(g, x, mu, S.hingeTol);
+  S.line = pressureLine(g, x);
+  if (opts.alt && p.model !== 'hc') S.alt = altLines(g, lam, mu, g.n > 25 ? 4 : 8).map(a => ({ label: a.label, x: a.x, line: pressureLine(g, a.x) }));
+  if (p.model === 'hc') S.mech = mechanism(g, S);
+  if (deformable) S.def = deformation(g, P, S);
+  S.Uadim = S.joints.reduce((s, j) => s + j.ustar, 0) / (g.gam * g.gam * g.R ** 3);
+  // equilibrio di ogni concio
+  let ef = 0, em = 0;
+  for (let i = 1; i <= g.n; i++) {
+    const L = g.J[i - 1], Rr = g.J[i], G = g.G[i];
+    const Rl = [ev(L.Rx, x), ev(L.Ry, x)], Rg = [ev(Rr.Rx, x), ev(Rr.Ry, x)];
+    const fx = Rl[0] - lam * g.W - Rg[0], fy = Rl[1] - g.W - Rg[1];
+    const cr = (a, b) => a[0] * b[1] - a[1] * b[0];
+    const mm = ev(L.M, x) + cr([L.C[0] - G[0], L.C[1] - G[1]], Rl) - ev(Rr.M, x) - cr([Rr.C[0] - G[0], Rr.C[1] - G[1]], Rg);
+    ef = Math.max(ef, Math.hypot(fx, fy) / g.W); em = Math.max(em, Math.abs(mm) / (g.W * g.R));
+  }
+  S.eqRes = { f: ef, m: em };
+  return S;
+}
+
+/* ---------- FEM 2D del singolo concio (Q4 isoparametrici, stato piano di tensione) ---------- */
+function femVoussoir(g, i, x, P, nr) {
+  const h = g.h, L = g.R * g.dth;
+  const nt = Math.max(4, Math.min(160, Math.round(nr * L / h)));
+  const ri = g.R - h / 2, pa = g.phi[i - 1], dph = g.dth / nt, drr = h / nr, nrp = nr + 1;
+  const nn = nrp * (nt + 1), nd = 2 * nn;
+  const X = new Float64Array(nn), Y = new Float64Array(nn);
+  for (let it = 0; it <= nt; it++) for (let ir = 0; ir <= nr; ir++) {
+    const id = it * nrp + ir, r = ri + ir * drr, f = pa + it * dph; X[id] = r * Math.sin(f); Y[id] = r * Math.cos(f);
+  }
+  const E = P.Eb, nu = P.nu, c0 = E / (1 - nu * nu), D11 = c0, D12 = c0 * nu, D33 = c0 * (1 - nu) / 2;
+  const bw = 2 * nrp + 4, S = bw + 1;
+  const K = new Float64Array(nd * S), F = new Float64Array(nd);
+  const bx = -x[3] * g.gam, by = -g.gam;
+  const G3 = 1 / Math.sqrt(3), GP = [[-G3, -G3], [G3, -G3], [G3, G3], [-G3, G3]];
+  const ke = new Float64Array(64), xe = new Float64Array(4), ye = new Float64Array(4), dof = new Int32Array(8);
+  const dNx = new Float64Array(4), dNy = new Float64Array(4), Nn = new Float64Array(4), da = new Float64Array(4), db = new Float64Array(4);
+  const shape = (xi, et) => {
+    Nn[0] = (1 - xi) * (1 - et) / 4; Nn[1] = (1 + xi) * (1 - et) / 4; Nn[2] = (1 + xi) * (1 + et) / 4; Nn[3] = (1 - xi) * (1 + et) / 4;
+    da[0] = -(1 - et) / 4; da[1] = (1 - et) / 4; da[2] = (1 + et) / 4; da[3] = -(1 + et) / 4;
+    db[0] = -(1 - xi) / 4; db[1] = -(1 + xi) / 4; db[2] = (1 + xi) / 4; db[3] = (1 - xi) / 4;
+    let j11 = 0, j12 = 0, j21 = 0, j22 = 0;
+    for (let k = 0; k < 4; k++) { j11 += da[k] * xe[k]; j12 += da[k] * ye[k]; j21 += db[k] * xe[k]; j22 += db[k] * ye[k]; }
+    const det = j11 * j22 - j12 * j21;
+    for (let k = 0; k < 4; k++) { dNx[k] = (j22 * da[k] - j12 * db[k]) / det; dNy[k] = (-j21 * da[k] + j11 * db[k]) / det; }
+    return Math.abs(det);
+  };
+  const elemNodes = (it, ir) => { const k = it * nrp + ir; return [k, k + 1, k + nrp + 1, k + nrp]; };
+  const loadEl = (it, ir) => { const en = elemNodes(it, ir); for (let a = 0; a < 4; a++) { xe[a] = X[en[a]]; ye[a] = Y[en[a]]; dof[2 * a] = 2 * en[a]; dof[2 * a + 1] = 2 * en[a] + 1; } };
+  for (let it = 0; it < nt; it++) for (let ir = 0; ir < nr; ir++) {
+    loadEl(it, ir); ke.fill(0);
+    for (const [xi, et] of GP) {
+      const dA = shape(xi, et);
+      for (let a = 0; a < 4; a++) {
+        F[dof[2 * a]] += Nn[a] * bx * dA; F[dof[2 * a + 1]] += Nn[a] * by * dA;
+        const ax = dNx[a], ay = dNy[a];
+        for (let b = 0; b < 4; b++) {
+          const bxx = dNx[b], byy = dNy[b];
+          ke[(2 * a) * 8 + 2 * b] += (ax * D11 * bxx + ay * D33 * byy) * dA;
+          ke[(2 * a) * 8 + 2 * b + 1] += (ax * D12 * byy + ay * D33 * bxx) * dA;
+          ke[(2 * a + 1) * 8 + 2 * b] += (ay * D12 * bxx + ax * D33 * byy) * dA;
+          ke[(2 * a + 1) * 8 + 2 * b + 1] += (ay * D11 * byy + ax * D33 * bxx) * dA;
+        }
+      }
+    }
+    for (let p = 0; p < 8; p++) for (let q = 0; q < 8; q++) { const gi = dof[p], gj = dof[q]; if (gj >= gi) K[gi * S + gj - gi] += ke[p * 8 + q]; }
+  }
+  // trazioni sulle facce: sinistra +R(i−1)i, destra −Ri(i+1); σ trapezia/triangolare, τ = (T/N)·σ
+  const JL = g.J[i - 1], JR = g.J[i];
+  const NL = ev(JL.N, x), TL = ev(JL.T, x), ML = ev(JL.M, x), NR = ev(JR.N, x), TR = ev(JR.T, x), MR = ev(JR.M, x);
+  const g3 = [-Math.sqrt(0.6), 0, Math.sqrt(0.6)], w3 = [5 / 9, 8 / 9, 5 / 9];
+  const face = (it, Nf, Tf, Mf, tv, rv, sg) => {
+    const ct = contact(Nf, Mf, h); if (!ct.ok) return ct;
+    const node = ir => it * nrp + ir;
+    if (!ct.trap && ct.a <= 1e-9 * h) {
+      const id = node(ct.e > 0 ? nr : 0);
+      F[2 * id] += sg * (Nf * tv[0] + Tf * rv[0]); F[2 * id + 1] += sg * (Nf * tv[1] + Tf * rv[1]);
+      ct.point = true; return ct;
+    }
+    const z = ct.trap ? null : (ct.e > 0 ? h / 2 - ct.a : -h / 2 + ct.a);
+    for (let ir = 0; ir < nr; ir++) {
+      const ya = -h / 2 + ir * drr, yb = ya + drr, cuts = [ya];
+      if (z !== null && z > ya && z < yb) cuts.push(z);
+      cuts.push(yb);
+      for (let c = 0; c < cuts.length - 1; c++) {
+        const hl = (cuts[c + 1] - cuts[c]) / 2, mid = (cuts[c + 1] + cuts[c]) / 2;
+        for (let q = 0; q < 3; q++) {
+          const y = mid + hl * g3[q], w = hl * w3[q], s = sigmaAt(ct, Nf, h, y), tau = Tf / Nf * s;
+          const La = (yb - y) / drr, Lb = (y - ya) / drr, qx = sg * (s * tv[0] + tau * rv[0]), qy = sg * (s * tv[1] + tau * rv[1]);
+          const ia = node(ir), ib = node(ir + 1);
+          F[2 * ia] += La * qx * w; F[2 * ia + 1] += La * qy * w; F[2 * ib] += Lb * qx * w; F[2 * ib + 1] += Lb * qy * w;
+        }
+      }
+    }
+    return ct;
+  };
+  const ctL = face(0, NL, TL, ML, g.t[i - 1], g.r[i - 1], 1), ctR = face(nt, NR, TR, MR, g.t[i], g.r[i], -1);
+  if (!ctL.ok || !ctR.ok) return { fail: 'giunto teso: carico non definito' };
+  // 3 vincoli per i moti rigidi (il carico è autoequilibrato)
+  const mid = Math.round(nr / 2), nA = mid, nB = nt * nrp + mid;
+  const fixed = [2 * nA, 2 * nA + 1, Math.abs(X[nB] - X[nA]) >= Math.abs(Y[nB] - Y[nA]) ? 2 * nB + 1 : 2 * nB];
+  const K0 = K.slice(), F0 = F.slice();
+  for (const c of fixed) {
+    for (let j = c; j <= Math.min(nd - 1, c + bw); j++) K[c * S + j - c] = 0;
+    for (let j = Math.max(0, c - bw); j < c; j++) K[j * S + c - j] = 0;
+    K[c * S] = 1; F[c] = 0;
+  }
+  // Cholesky a banda
+  for (let a = 0; a < nd; a++) {
+    const jmax = Math.min(nd - 1, a + bw);
+    for (let j = a; j <= jmax; j++) {
+      let s = K[a * S + j - a];
+      for (let k = Math.max(0, j - bw); k < a; k++) s -= K[k * S + a - k] * K[k * S + j - k];
+      if (j === a) { if (!(s > 0)) return { fail: 'matrice di rigidezza non definita positiva' }; K[a * S] = Math.sqrt(s); }
+      else K[a * S + j - a] = s / K[a * S];
+    }
+  }
+  const u = F.slice();
+  for (let a = 0; a < nd; a++) { let s = u[a]; for (let k = Math.max(0, a - bw); k < a; k++) s -= K[k * S + a - k] * u[k]; u[a] = s / K[a * S]; }
+  for (let a = nd - 1; a >= 0; a--) { let s = u[a]; for (let j = a + 1; j <= Math.min(nd - 1, a + bw); j++) s -= K[a * S + j - a] * u[j]; u[a] = s / K[a * S]; }
+  const reac = fixed.map(c => { let s = -F0[c]; for (let j = Math.max(0, c - bw); j <= Math.min(nd - 1, c + bw); j++) { const lo = Math.min(c, j), hi = Math.max(c, j); s += K0[lo * S + hi - lo] * u[j]; } return s; });
+  // tensioni ai punti di Gauss, estrapolate ai nodi e mediate
+  const sxx = new Float64Array(nn), syy = new Float64Array(nn), sxy = new Float64Array(nn), cnt = new Float64Array(nn);
+  const s3 = Math.sqrt(3), LN = [[-1, -1], [1, -1], [1, 1], [-1, 1]], sg = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  for (let it = 0; it < nt; it++) for (let ir = 0; ir < nr; ir++) {
+    loadEl(it, ir); const en = elemNodes(it, ir);
+    GP.forEach(([xi, et], q) => {
+      shape(xi, et); let ex = 0, ey = 0, gxy = 0;
+      for (let a = 0; a < 4; a++) { const ux = u[dof[2 * a]], uy = u[dof[2 * a + 1]]; ex += dNx[a] * ux; ey += dNy[a] * uy; gxy += dNy[a] * ux + dNx[a] * uy; }
+      sg[q][0] = D11 * ex + D12 * ey; sg[q][1] = D12 * ex + D11 * ey; sg[q][2] = D33 * gxy;
+    });
+    for (let a = 0; a < 4; a++) {
+      const sa = s3 * LN[a][0], ta = s3 * LN[a][1]; let v0 = 0, v1 = 0, v2 = 0;
+      for (let q = 0; q < 4; q++) { const w = (1 + sa * LN[q][0]) * (1 + ta * LN[q][1]) / 4; v0 += w * sg[q][0]; v1 += w * sg[q][1]; v2 += w * sg[q][2]; }
+      sxx[en[a]] += v0; syy[en[a]] += v1; sxy[en[a]] += v2; cnt[en[a]]++;
+    }
+  }
+  for (let a = 0; a < nn; a++) { sxx[a] /= cnt[a]; syy[a] /= cnt[a]; sxy[a] /= cnt[a]; }
+  return { kind: 'fem', i, nr, nt, nrp, ri, pa, dph, drr, X, Y, sxx, syy, sxy, u, reac, ctL, ctR, NL, TL, ML, NR, TR, MR, ndof: nd };
+}
+
+// stesso reticolo polare, tensioni dalla teoria della trave (Winkler o Navier) + τ parabolica
+function beamField(g, i, x, nr, kind) {
+  const h = g.h, R = g.R, L = R * g.dth, nt = Math.max(4, Math.min(160, Math.round(nr * L / h)));
+  const ri = R - h / 2, pa = g.phi[i - 1], dph = g.dth / nt, drr = h / nr, nrp = nr + 1, nn = nrp * (nt + 1);
+  const X = new Float64Array(nn), Y = new Float64Array(nn), sxx = new Float64Array(nn), syy = new Float64Array(nn), sxy = new Float64Array(nn);
+  const Lr = Math.log((R + h / 2) / (R - h / 2));
+  for (let it = 0; it <= nt; it++) {
+    const cf = cutInVoussoir(g, i, it / nt), N = ev(cf.N, x), T = ev(cf.T, x), M = ev(cf.M, x), t = cf.t, rr = cf.r;
+    const Bw = -M / (h - R * Lr), Aw = (N - Bw * Lr) / h;
+    for (let ir = 0; ir <= nr; ir++) {
+      const id = it * nrp + ir, y = -h / 2 + ir * drr, r = R + y;
+      X[id] = r * rr[0]; Y[id] = r * rr[1];
+      const sth = kind === 'winkler' ? Aw + Bw / r : N / h - 12 * M * y / (h * h * h);
+      const tau = 1.5 * T / h * (1 - 4 * y * y / (h * h));
+      const stt = -sth, str = -tau;
+      sxx[id] = stt * t[0] * t[0] + 2 * str * t[0] * rr[0];
+      syy[id] = stt * t[1] * t[1] + 2 * str * t[1] * rr[1];
+      sxy[id] = stt * t[0] * t[1] + str * (t[0] * rr[1] + t[1] * rr[0]);
+    }
+  }
+  const JL = g.J[i - 1], JR = g.J[i];
+  const NL = ev(JL.N, x), ML = ev(JL.M, x), NR = ev(JR.N, x), MR = ev(JR.M, x);
+  return { kind, i, nr, nt, nrp, ri, pa, dph, drr, X, Y, sxx, syy, sxy, ctL: contact(NL, ML, h), ctR: contact(NR, MR, h),
+    NL, TL: ev(JL.T, x), ML, NR, TR: ev(JR.T, x), MR };
+}
+
+const _fv = new Float64Array(3);
+function fieldAt(fd, r, ph) {
+  const a = (r - fd.ri) / fd.drr, b = (ph - fd.pa) / fd.dph;
+  if (a < -1e-9 || a > fd.nr + 1e-9 || b < -1e-9 || b > fd.nt + 1e-9) return null;
+  const ir = Math.min(fd.nr - 1, Math.max(0, Math.floor(a))), it = Math.min(fd.nt - 1, Math.max(0, Math.floor(b)));
+  const s = a - ir, t = b - it, n00 = it * fd.nrp + ir, n01 = n00 + 1, n10 = n00 + fd.nrp, n11 = n10 + 1;
+  const w00 = (1 - s) * (1 - t), w01 = s * (1 - t), w10 = (1 - s) * t, w11 = s * t;
+  _fv[0] = w00 * fd.sxx[n00] + w01 * fd.sxx[n01] + w10 * fd.sxx[n10] + w11 * fd.sxx[n11];
+  _fv[1] = w00 * fd.syy[n00] + w01 * fd.syy[n01] + w10 * fd.syy[n10] + w11 * fd.syy[n11];
+  _fv[2] = w00 * fd.sxy[n00] + w01 * fd.sxy[n01] + w10 * fd.sxy[n10] + w11 * fd.sxy[n11];
+  return _fv;
+}
+function princ(sx, sy, txy) {
+  const c = (sx + sy) / 2, R = Math.hypot((sx - sy) / 2, txy);
+  return { s1: c + R, s2: c - R, th: 0.5 * Math.atan2(2 * txy, sx - sy) };
+}
+function resultantCut(fd, g, u) {
+  const ph = g.phi[fd.i - 1] + u * g.dth, t = [Math.cos(ph), -Math.sin(ph)], r = [Math.sin(ph), Math.cos(ph)], m = 60;
+  let N = 0, T = 0, M = 0;
+  for (let k = 0; k <= m; k++) {
+    const y = -g.h / 2 + g.h * k / m, w = (k === 0 || k === m ? 1 : k % 2 ? 4 : 2) * g.h / m / 3;
+    const s = fieldAt(fd, g.R + y, ph); if (!s) continue;
+    const q = [-(s[0] * t[0] + s[2] * t[1]), -(s[2] * t[0] + s[1] * t[1])];
+    N += w * (q[0] * t[0] + q[1] * t[1]); T += w * (q[0] * r[0] + q[1] * r[1]); M += w * y * (r[0] * q[1] - r[1] * q[0]);
+  }
+  return { N, T, M, e: -M / N, ph };
+}
+function fieldStats(fd, g, S) {
+  const pb = fd.pa + g.dth; let s2min = 0, s2loc = null, s1max = -Infinity, s1loc = null, s1in = -Infinity, s1inloc = null;
+  const v1 = [], v2 = [];
+  for (let it = 0; it <= fd.nt; it++) for (let ir = 0; ir <= fd.nr; ir++) {
+    const id = it * fd.nrp + ir, pr = princ(fd.sxx[id], fd.syy[id], fd.sxy[id]);
+    v1.push(pr.s1); v2.push(pr.s2);
+    const P = [fd.X[id], fd.Y[id]];
+    if (pr.s2 < s2min) { s2min = pr.s2; s2loc = P; }
+    if (pr.s1 > s1max) { s1max = pr.s1; s1loc = P; }
+    const r = fd.ri + ir * fd.drr, ph = fd.pa + it * fd.dph;
+    if ((ph - fd.pa) * r > 0.15 * g.h && (pb - ph) * r > 0.15 * g.h && pr.s1 > s1in) { s1in = pr.s1; s1inloc = P; }
+  }
+  const pct = (arr, q) => { const a = arr.slice().sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.max(0, Math.round(q * (a.length - 1))))]; };
+  let de = 0, dN = 0;
+  const cuts = [];
+  for (let q = 1; q <= 9; q++) {
+    const u = q / 10, rc = resultantCut(fd, g, u), cf = cutInVoussoir(g, fd.i, u);
+    const Nb = ev(cf.N, S.x), eb = -ev(cf.M, S.x) / Nb;
+    de = Math.max(de, Math.abs(rc.e - eb) / g.h); dN = Math.max(dN, Math.abs(rc.N - Nb) / Math.abs(Nb));
+    cuts.push({ u, P: [cf.C[0] + rc.e * cf.r[0], cf.C[1] + rc.e * cf.r[1]] });
+  }
+  return { s2min, s2loc, s1max, s1loc, s1in: isFinite(s1in) ? s1in : s1max, s1inloc: s1inloc || s1loc,
+    p98neg: -pct(v2, 0.02), p98pos: Math.max(0, pct(v1, 0.98)), s1negMax: -Math.min(...v1), de, dN, cuts };
+}
+function isoLines(fd, g, nl) {
+  const h = g.h, R = g.R, pa = fd.pa, pb = pa + g.dth, ri = R - h / 2, ro = R + h / 2;
+  const phm = (pa + pb) / 2, tm = [Math.cos(phm), -Math.sin(phm)], rm = [Math.sin(phm), Math.cos(phm)], m = 240;
+  const flux = [0]; let prev = null;
+  for (let k = 0; k <= m; k++) {
+    const y = -h / 2 + h * k / m, s = fieldAt(fd, R + y, phm);
+    const stt = s ? s[0] * tm[0] * tm[0] + 2 * s[2] * tm[0] * tm[1] + s[1] * tm[1] * tm[1] : 0, c = Math.max(0, -stt);
+    if (k > 0) flux.push(flux[k - 1] + (prev + c) / 2 * h / m);
+    prev = c;
+  }
+  const tot = flux[m]; if (!(tot > 0)) return [];
+  const dirAt = (P, dp) => {
+    const r = Math.hypot(P[0], P[1]), ph = Math.atan2(P[0], P[1]);
+    if (r < ri || r > ro || ph < pa || ph > pb) return null;
+    const s = fieldAt(fd, r, ph); if (!s) return null;
+    const th = princ(s[0], s[1], s[2]).th; let v = [-Math.sin(th), Math.cos(th)];
+    if (v[0] * dp[0] + v[1] * dp[1] < 0) v = [-v[0], -v[1]];
+    return v;
+  };
+  const st = h / 70;
+  const trace = (P0, d0) => {
+    const pts = []; let P = P0, d = d0;
+    for (let k = 0; k < 1500; k++) {
+      const k1 = dirAt(P, d); if (!k1) break;
+      const Pm = [P[0] + st / 2 * k1[0], P[1] + st / 2 * k1[1]], k2 = dirAt(Pm, k1);
+      if (!k2) { pts.push([P[0] + st * k1[0], P[1] + st * k1[1]]); break; }
+      P = [P[0] + st * k2[0], P[1] + st * k2[1]]; d = k2; pts.push(P);
+    }
+    return pts;
+  };
+  const lines = [];
+  for (let q = 0; q < nl; q++) {
+    const target = (q + 0.5) / nl * tot; let k = 1; while (k < m && flux[k] < target) k++;
+    const f = (target - flux[k - 1]) / Math.max(1e-30, flux[k] - flux[k - 1]), y = -h / 2 + h * (k - 1 + f) / m;
+    const P0 = [(R + y) * rm[0], (R + y) * rm[1]];
+    const fw = trace(P0, tm), bk = trace(P0, [-tm[0], -tm[1]]);
+    lines.push(bk.reverse().concat([P0], fw));
+  }
+  return lines;
+}
+function voussoirField(S, i, method, nr) {
+  if (!S || S.fail || i < 1 || i > S.g.n) return null;
+  const fd = method === 'fem' ? femVoussoir(S.g, i, S.x, S.P, nr) : beamField(S.g, i, S.x, nr, method);
+  if (fd.fail) return fd;
+  fd.stats = fieldStats(fd, S.g, S);
+  return fd;
+}
+
+/* =====================================================================
+   INTERFACCIA
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+function fmt(v, d = 3) {
+  if (v === null || v === undefined || Number.isNaN(v)) return '—';
+  if (!isFinite(v)) return v > 0 ? '∞' : '−∞';
+  let s = v.toFixed(d); if (/^-0(\.0*)?$/.test(s)) s = s.slice(1);
+  return s.replace('.', ',').replace('-', '−');
+}
+function fmtE(v, d = 1) {
+  if (!isFinite(v)) return '—'; if (v === 0) return '0';
+  const e = Math.floor(Math.log10(Math.abs(v))), m = v / 10 ** e;
+  return (m.toFixed(d) + '·10' + sup(e)).replace('.', ',').replace('-', '−');
+}
+const sup = e => String(e).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'['0123456789'.indexOf(c)] || (c === '-' ? '⁻' : c)).join('');
+const jn = (g, j) => g.n < 10 ? `${j}${j + 1}` : `${j}–${j + 1}`;
+const MPa = v => v / 1000;
+
+const KEYS = ['theta0', 'hR', 'n', 'R', 'gamma', 'frac', 'mu', 'Em', 'tg', 'Eb', 'nu', 'kx', 'ky', 'kphi', 'dx', 'dy', 'dphi', 'fm', 'ft'];
+function readParams() {
+  const p = {};
+  for (const k of KEYS) { const v = parseFloat($('p_' + k).value); p[k] = isFinite(v) ? v : 0; }
+  p.n = Math.round(p.n); p.model = $('p_model').value; p.abut = $('p_abut').value; p.muOn = $('p_muOn').checked;
+  p.R = Math.max(0.1, p.R); p.gamma = Math.max(0.1, p.gamma); p.mu = Math.max(0.01, p.mu);
+  for (const k of ['Em', 'tg', 'Eb', 'kx', 'ky', 'kphi', 'fm', 'ft']) p[k] = Math.max(1e-6, p[k]);
+  p.nu = Math.min(0.49, Math.max(0, p.nu));
+  return p;
+}
+
+function cssVars() {
+  const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim();
+  const o = {}; for (const n of ['bg', 'surface', 'ink', 'ink2', 'muted', 'grid', 'axis', 'accent', 's2', 'alt', 'good', 'warn', 'serious', 'crit', 'stone', 'stone-sel', 'stone-edge', 'abut', 'div-mid', 'neg', 'pos']) o[n] = v('--' + n);
+  o.seq = v('--seq').split(',').map(s => hex2rgb(s));
+  return o;
+}
+function hex2rgb(h) { h = h.trim().replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+function rampC(stops, t) {
+  t = Math.max(0, Math.min(1, t)); const n = stops.length - 1, k = Math.min(n - 1, Math.floor(t * n)), f = t * n - k, a = stops[k], b = stops[k + 1];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+const STATE = {
+  comp: { lab: 'tutto compresso', ico: '●', c: 'good' }, parz: { lab: 'parzializzato', ico: '◐', c: 'warn' },
+  cern: { lab: 'cerniera', ico: '○', c: 'crit' }, scorr: { lab: 'scorrimento', ico: '⇄', c: 'serious' }, traz: { lab: 'teso (non ammissibile)', ico: '✕', c: 'crit' }
+};
+
+function setupCanvas(cv, cssH) {
+  const dpr = window.devicePixelRatio || 1, W = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.style.height = cssH + 'px';
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(cssH * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(cssH * dpr); }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, W, H: cssH, dpr };
+}
+
+const ui = { S: null, sel: null, fd: null, A: null, fdA: null, sweep: null, sweepKey: null, animLam: null, animDef: null, defT: 1, archT: null, hoverJ: -1 };
+
+/* ---------- vista arco ---------- */
+function archBounds(g) {
+  const pts = [], La = 0.32 * g.R;
+  for (let j = 0; j <= g.n; j++) for (const y of [-g.h / 2, g.h / 2]) pts.push([(g.R + y) * g.r[j][0], (g.R + y) * g.r[j][1]]);
+  for (let k = 0; k <= 40; k++) { const f = -g.th0 / 2 + k * g.th0 / 40; pts.push([(g.R + g.h / 2) * Math.sin(f), (g.R + g.h / 2) * Math.cos(f)]); }
+  const ab = abutPolys(g, La); for (const pl of ab) pts.push(...pl);
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const p of pts) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
+  return { x0, x1, y0, y1, ab };
+}
+function abutPolys(g, La) {
+  const mk = (j, sg) => {
+    const C = g.C[j], r = g.r[j], t = g.t[j], E = [C[0] + g.h / 2 * r[0], C[1] + g.h / 2 * r[1]], I = [C[0] - g.h / 2 * r[0], C[1] - g.h / 2 * r[1]];
+    const E2 = [E[0] - sg * La * t[0], E[1] - sg * La * t[1]], I2 = [I[0] - sg * La * t[0], I[1] - sg * La * t[1]];
+    const yg = Math.min(E2[1], I2[1], I[1]) - 0.06 * g.R;
+    return [E, E2, [E2[0], yg], [I[0], yg], I];
+  };
+  return [mk(0, 1), mk(g.n, -1)];
+}
+function voussoirPoly(g, i, mapP) {
+  const ext = [], int = [], NS = 10;
+  for (let q = 0; q <= NS; q++) {
+    const u = q / NS, ph = g.phi[i - 1] + u * g.dth, s = Math.sin(ph), c = Math.cos(ph);
+    ext.push(mapP([(g.R + g.h / 2) * s, (g.R + g.h / 2) * c], u)); int.push(mapP([(g.R - g.h / 2) * s, (g.R - g.h / 2) * c], u));
+  }
+  return ext.concat(int.reverse());
+}
+function drawArch() {
+  const S = ui.S, cv = $('cvArch'); if (!S) return;
+  const g = S.g, col = cssVars(), b = archBounds(g);
+  const W = cv.clientWidth || 600, m = 26, top = 30;
+  let s = (W - 2 * m) / (b.x1 - b.x0); let H = (b.y1 - b.y0) * s + top + m;
+  const Hmax = Math.min(600, Math.max(320, window.innerHeight * 0.62));
+  if (H > Hmax) { s = (Hmax - top - m) / (b.y1 - b.y0); H = Hmax; }
+  const { ctx } = setupCanvas(cv, H);
+  const ox = W / 2 - s * (b.x0 + b.x1) / 2, oy = top + s * b.y1;
+  const T = p => [ox + s * p[0], oy - s * p[1]];
+  ui.archT = { s, ox, oy };
+  ctx.clearRect(0, 0, W, H);
+  const path = (pts, close) => { ctx.beginPath(); pts.forEach((p, k) => { if (!p) return; const q = T(p); k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); if (close) ctx.closePath(); };
+  const line = (pts) => { ctx.beginPath(); let pen = false; for (const p of pts) { if (!p) { pen = false; continue; } const q = T(p); pen ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); pen = true; } };
+  // spalle
+  for (const pl of b.ab) {
+    path(pl, true); ctx.fillStyle = col.abut; ctx.fill(); ctx.strokeStyle = col['stone-edge']; ctx.lineWidth = 1; ctx.stroke();
+    ctx.save(); path(pl, true); ctx.clip(); ctx.strokeStyle = col.axis; ctx.lineWidth = 1;
+    for (let k = -60; k < 60; k++) { ctx.beginPath(); ctx.moveTo(k * 9, 0); ctx.lineTo(k * 9 + H, H); ctx.stroke(); }
+    ctx.restore();
+  }
+  // conci
+  for (let i = 1; i <= g.n; i++) {
+    path(voussoirPoly(g, i, p => p), true);
+    ctx.fillStyle = i === ui.sel ? col['stone-sel'] : col.stone; ctx.fill();
+    ctx.strokeStyle = i === ui.sel ? col.accent : col['stone-edge']; ctx.lineWidth = i === ui.sel ? 2 : 1; ctx.stroke();
+  }
+  if (g.n <= 30) {
+    ctx.fillStyle = col.muted; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let i = 1; i <= g.n; i++) { const r = g.R - g.h / 2 - Math.max(0.09 * g.R, 14 / s), q = T([r * Math.sin(g.psi[i]), r * Math.cos(g.psi[i])]); ctx.fillText(String(i), q[0], q[1]); }
+  }
+  // carichi
+  ctx.fillStyle = col.ink2; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText(S.fail ? '' : `← sisma λWᵢ   ↓ peso Wᵢ   (λ = ${fmt(S.lam, 3)})`, 8, 6);
+  if (S.fail) { $('archMsg').innerHTML = `<div class="msg crit">${S.fail}</div>`; return; }
+  $('archMsg').innerHTML = '';
+  // deformata / cinematismo
+  const ampSl = 10 ** parseFloat($('v_amp').value);
+  $('o_amp').textContent = '';
+  if ($('v_def').checked) {
+    const fT = $('v_anim').checked ? ui.defT : 1;
+    if (S.def && S.def.dmax > 0) {
+      const amp = 0.07 * g.R / S.def.dmax * ampSl, A = amp * fT;
+      $('o_amp').textContent = '×' + Math.round(amp).toLocaleString('it-IT');
+      ctx.globalAlpha = 0.85;
+      for (let i = 1; i <= g.n; i++) {
+        const st = S.def.stations[i];
+        const mp = (P, u) => { let k = 0; while (k < st.length - 1 && st[k + 1].u <= u + 1e-9) k++; const d = dispAt(st[Math.min(k, st.length - 1)].st, P); return [P[0] + A * d[0], P[1] + A * d[1]]; };
+        path(voussoirPoly(g, i, mp), true); ctx.fillStyle = hexA(col.accent, 0.13); ctx.fill(); ctx.strokeStyle = col.accent; ctx.lineWidth = 1.2; ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    } else if (S.mech && S.mech.ok) {
+      const M = S.mech; let dmax = 1e-30;
+      for (let i = 1; i <= g.n; i++) for (const pt of voussoirPoly(g, i, p => p)) dmax = Math.max(dmax, Math.hypot(...M.disp(pt, M.blockOf(i))));
+      const amp = 0.09 * g.R / dmax * ampSl * fT;
+      $('o_amp').textContent = 'rotazione ×' + fmt(amp * Math.abs(M.th[0]) / D2R, 1) + '°';
+      const rot = (P, c, a) => { const ca = Math.cos(a), sa = Math.sin(a), d = [P[0] - c[0], P[1] - c[1]]; return [c[0] + ca * d[0] - sa * d[1], c[1] + sa * d[0] + ca * d[1]]; };
+      const mv = blk => P => {
+        if (blk === 1) return rot(P, M.P[0], amp * M.th[0]);
+        if (blk === 3) return rot(P, M.P[3], amp * M.th[2]);
+        if (blk === 2) return M.O2 ? rot(P, M.O2, amp * M.th[1]) : [P[0] + amp * M.uB[0], P[1] + amp * M.uB[1]];
+        return P;
+      };
+      for (let i = 1; i <= g.n; i++) {
+        const blk = M.blockOf(i); if (!blk) continue;
+        path(voussoirPoly(g, i, mv(blk)), true); ctx.fillStyle = hexA(col.accent, 0.13); ctx.fill(); ctx.strokeStyle = col.accent; ctx.lineWidth = 1.2; ctx.stroke();
+      }
+    }
+  }
+  // altre linee ammissibili
+  if ($('v_alt').checked && S.alt) {
+    ctx.strokeStyle = col.alt; ctx.lineWidth = 1.2;
+    for (const a of S.alt) { line(a.line); ctx.stroke(); }
+    ctx.fillStyle = col.muted; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    for (const a of S.alt) if (a.label) {
+      const mid = a.line[Math.floor(a.line.length / 2)]; if (!mid) continue; const q = T(mid);
+      ctx.fillText(a.label, q[0] + 6, q[1] + (a.label === 'H max' ? 10 : -10));
+    }
+  }
+  // stato A
+  if (ui.A && ui.A.S && !ui.A.S.fail && ui.A.S.g.n === g.n && ui.A.S.p.theta0 === S.p.theta0 && ui.A.S.p.hR === S.p.hR && ui.A.S.p.R === S.p.R) {
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = col.s2; ctx.lineWidth = 2; line(ui.A.S.line); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // giunti
+  const smaxAll = Math.max(1e-30, ...S.joints.map(j => isFinite(j.ct.smax) ? j.ct.smax : 0));
+  S.joints.forEach((jr, j) => {
+    const C = g.C[j], r = g.r[j], t = g.t[j], hh = g.h / 2, c = col[STATE[jr.state].c];
+    const I = [C[0] - hh * r[0], C[1] - hh * r[1]], E = [C[0] + hh * r[0], C[1] + hh * r[1]];
+    path([I, E]); ctx.strokeStyle = col.ink2; ctx.lineWidth = 1; ctx.stroke();
+    if (jr.ct.ok) {
+      let y0 = -hh, y1 = hh; if (!jr.ct.trap) { if (jr.e > 0) y0 = hh - jr.ct.a; else y1 = -hh + jr.ct.a; }
+      if (y1 - y0 > 1e-9) { path([[C[0] + y0 * r[0], C[1] + y0 * r[1]], [C[0] + y1 * r[0], C[1] + y1 * r[1]]]); ctx.strokeStyle = c; ctx.lineWidth = 4.5; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt'; }
+      if ($('v_sig').checked) {
+        const scl = 0.42 * g.h / smaxAll, pts = [];
+        if (jr.ct.trap || jr.ct.a > 1e-9 * g.h) {
+          for (let k = 0; k <= 30; k++) { const y = -hh + g.h * k / 30, sv = sigmaAt(jr.ct, jr.N, g.h, y); pts.push([C[0] + y * r[0] + sv * scl * t[0], C[1] + y * r[1] + sv * scl * t[1]]); }
+          pts.push(E); pts.unshift(I);
+          path(pts, true); ctx.fillStyle = hexA(c, 0.25); ctx.fill(); ctx.strokeStyle = hexA(c, 0.9); ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+      if ($('v_res').checked && jr.Cp) {
+        const Rv = [ev(g.J[j].Rx, S.x), ev(g.J[j].Ry, S.x)], L = Math.hypot(...Rv), sc = 0.35 * g.R / Math.max(...S.joints.map(q => Math.hypot(q.N, q.T)));
+        arrow(ctx, T(jr.Cp), T([jr.Cp[0] + Rv[0] * sc, jr.Cp[1] + Rv[1] * sc]), col.ink, 1.5);
+        void L;
+      }
+    }
+  });
+  // linea delle pressioni
+  ctx.strokeStyle = col.accent; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; line(S.line); ctx.stroke();
+  S.joints.forEach(jr => { if (!jr.Cp) return; const q = T(jr.Cp); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fillStyle = col.accent; ctx.fill(); });
+  // cerniere
+  S.joints.forEach((jr, j) => {
+    if (!jr.hinge) return; const s0 = Math.sign(jr.e), C = g.C[j], r = g.r[j], q = T([C[0] + s0 * g.h / 2 * r[0], C[1] + s0 * g.h / 2 * r[1]]);
+    ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, 7); ctx.fillStyle = col.surface; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = col.crit; ctx.stroke();
+  });
+  if (S.mech && S.mech.ok && S.mech.O2 && $('v_def').checked) {
+    const q = T(S.mech.O2);
+    if (q[0] > 0 && q[0] < W && q[1] > 0 && q[1] < H) { ctx.fillStyle = col.muted; ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.fillText('centro di rotazione blocco 2', q[0] + 6, q[1]); }
+  }
+  // nomi dei giunti
+  if (g.n <= 14) {
+    ctx.fillStyle = col.ink2; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let j = 0; j <= g.n; j++) { const rr = g.R + g.h / 2 + Math.max(0.06 * g.R, 12 / s), q = T([rr * g.r[j][0], rr * g.r[j][1]]); ctx.fillText(jn(g, j), q[0], q[1]); }
+  }
+  if (ui.hoverJ >= 0) {
+    const C = g.C[ui.hoverJ], r = g.r[ui.hoverJ], hh = g.h / 2;
+    path([[C[0] - hh * r[0], C[1] - hh * r[1]], [C[0] + hh * r[0], C[1] + hh * r[1]]]); ctx.strokeStyle = col.ink; ctx.lineWidth = 2; ctx.stroke();
+  }
+}
+function hexA(c, a) { if (c.startsWith('#')) { const [r, g, b] = hex2rgb(c); return `rgba(${r},${g},${b},${a})`; } return c; }
+function arrow(ctx, a, b, color, w) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy); if (L < 2) return;
+  const ux = dx / L, uy = dy / L, hs = Math.min(8, L * 0.4);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w;
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0] - ux * hs, b[1] - uy * hs); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - ux * hs - uy * hs * 0.5, b[1] - uy * hs + ux * hs * 0.5); ctx.lineTo(b[0] - ux * hs + uy * hs * 0.5, b[1] - uy * hs - ux * hs * 0.5); ctx.closePath(); ctx.fill();
+}
+function archPick(ev_) {
+  const S = ui.S; if (!S || !ui.archT) return null;
+  const rect = $('cvArch').getBoundingClientRect(), X = ev_.clientX - rect.left, Y = ev_.clientY - rect.top, T = ui.archT;
+  const x = (X - T.ox) / T.s, y = -(Y - T.oy) / T.s, g = S.g, r = Math.hypot(x, y), ph = Math.atan2(x, y);
+  let jBest = -1, dBest = 9 / T.s;
+  for (let j = 0; j <= g.n; j++) {
+    const yy = x * g.r[j][0] + y * g.r[j][1] - g.R, tt = x * g.t[j][0] + y * g.t[j][1] - (g.C[j][0] * g.t[j][0] + g.C[j][1] * g.t[j][1]);
+    if (Math.abs(yy) <= g.h / 2 + 4 / T.s && Math.abs(tt) < dBest) { dBest = Math.abs(tt); jBest = j; }
+  }
+  let vi = null;
+  if (r >= g.R - g.h / 2 && r <= g.R + g.h / 2 && ph >= -g.th0 / 2 && ph <= g.th0 / 2) vi = Math.min(g.n, Math.floor((ph + g.th0 / 2) / g.dth) + 1);
+  return { j: jBest, i: vi, cx: ev_.clientX, cy: ev_.clientY };
+}
+
+/* ---------- vista concio ---------- */
+function vousTransform(g, i, W, Hmax) {
+  const psi = g.psi[i], c = Math.cos(psi), s = Math.sin(psi), G = g.G[i];
+  const toL = P => { const dx = P[0] - G[0], dy = P[1] - G[1]; return [c * dx - s * dy, s * dx + c * dy]; };
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const P of voussoirPoly(g, i, p => p)) { const l = toL(P); x0 = Math.min(x0, l[0]); x1 = Math.max(x1, l[0]); y0 = Math.min(y0, l[1]); y1 = Math.max(y1, l[1]); }
+  const mx = Math.min(78, Math.max(34, W * 0.13)), my = 26;
+  let sc = (W - 2 * mx) / (x1 - x0), H = (y1 - y0) * sc + 2 * my;
+  if (H > Hmax) { sc = (Hmax - 2 * my) / (y1 - y0); H = Hmax; }
+  const cx = W / 2 - sc * (x0 + x1) / 2, cy = my + sc * y1;
+  const T = P => { const l = toL(P); return [cx + sc * l[0], cy - sc * l[1]]; };
+  const inv = (X, Y) => { const lx = (X - cx) / sc, ly = -(Y - cy) / sc; return [G[0] + c * lx + s * ly, G[1] - s * lx + c * ly]; };
+  return { T, inv, sc, H, W };
+}
+function mapValue(mode, s, ph) {
+  if (mode === 's2' || mode === 's1') { const pr = princ(s[0], s[1], s[2]); return mode === 's2' ? pr.s2 : pr.s1; }
+  const t = [Math.cos(ph), -Math.sin(ph)], r = [Math.sin(ph), Math.cos(ph)];
+  if (mode === 'stt') return s[0] * t[0] * t[0] + 2 * s[2] * t[0] * t[1] + s[1] * t[1] * t[1];
+  return s[0] * t[0] * r[0] + s[2] * (t[0] * r[1] + t[1] * r[0]) + s[1] * t[1] * r[1];
+}
+function mapScale(mode, fds) {
+  // scala robusta (98° percentile) per non farsi schiacciare dalle singolarità alle cerniere
+  let neg = 1e-30, pos = 1e-30;
+  for (const fd of fds) {
+    if (!fd || fd.fail) continue;
+    const vals = [];
+    for (let it = 0; it <= fd.nt; it++) for (let ir = 0; ir <= fd.nr; ir++) { const id = it * fd.nrp + ir; vals.push(mapValue(mode, [fd.sxx[id], fd.syy[id], fd.sxy[id]], fd.pa + it * fd.dph)); }
+    vals.sort((a, b) => a - b);
+    neg = Math.max(neg, -vals[Math.round(0.02 * (vals.length - 1))]); pos = Math.max(pos, vals[Math.round(0.98 * (vals.length - 1))]);
+    if (mode === 'tau' || mode === 'stt') { const mx = Math.max(neg, pos); neg = pos = mx; }
+  }
+  return { neg: Math.max(neg, 1e-30), pos: Math.max(pos, 1e-30), s1pos: Math.max(1e-30, ...fds.filter(f => f && !f.fail).map(f => f.stats.p98pos)) };
+}
+function colorFor(mode, v, sc, col) {
+  if (mode === 's2') return rampC(col.seq, Math.max(0, -v) / sc.neg);
+  const mid = hex2rgb(col['div-mid']);
+  if (v < 0) return rampC([mid, hex2rgb(col.neg)], -v / sc.neg);
+  return rampC([mid, hex2rgb(col.pos)], v / sc.pos);
+}
+function drawVoussoir(cv, S, fd, sc, title) {
+  const W = cv.clientWidth || 600, g = S.g, i = fd.i, col = cssVars();
+  const tr = vousTransform(g, i, W, 380), { ctx, H } = setupCanvas(cv, tr.H), T = tr.T;
+  ctx.clearRect(0, 0, W, H);
+  const mode = $('v_map').value, pa = g.phi[i - 1], pb = g.phi[i], ri = g.R - g.h / 2, ro = g.R + g.h / 2;
+  // raster del campo
+  const off = document.createElement('canvas'); off.width = Math.ceil(W); off.height = Math.ceil(H);
+  const octx = off.getContext('2d'), img = octx.createImageData(off.width, off.height), d = img.data;
+  const showT = $('v_tens').checked && mode === 's2', red = hex2rgb(col.pos);
+  for (let py = 0; py < off.height; py++) for (let px = 0; px < off.width; px++) {
+    const P = tr.inv(px + 0.5, py + 0.5), r = Math.hypot(P[0], P[1]), ph = Math.atan2(P[0], P[1]);
+    if (r < ri || r > ro || ph < pa || ph > pb) continue;
+    const s = fieldAt(fd, r, ph); if (!s) continue;
+    let c = colorFor(mode, mapValue(mode, s, ph), sc, col);
+    if (showT) { const s1 = princ(s[0], s[1], s[2]).s1; if (s1 > 0) { const a = 0.75 * Math.min(1, s1 / sc.s1pos); c = [c[0] + (red[0] - c[0]) * a, c[1] + (red[1] - c[1]) * a, c[2] + (red[2] - c[2]) * a]; } }
+    const k = 4 * (py * off.width + px); d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = 255;
+  }
+  octx.putImageData(img, 0, 0); ctx.drawImage(off, 0, 0, W, H);
+  const path = (pts, close) => { ctx.beginPath(); pts.forEach((p, k) => { const q = T(p); k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); if (close) ctx.closePath(); };
+  if ($('v_grid').checked) {
+    ctx.strokeStyle = 'rgba(128,128,128,.35)'; ctx.lineWidth = 0.5;
+    for (let ir = 0; ir <= fd.nr; ir++) { const pts = []; for (let it = 0; it <= fd.nt; it++) pts.push([fd.X[it * fd.nrp + ir], fd.Y[it * fd.nrp + ir]]); path(pts); ctx.stroke(); }
+    for (let it = 0; it <= fd.nt; it++) { path([[fd.X[it * fd.nrp], fd.Y[it * fd.nrp]], [fd.X[it * fd.nrp + fd.nr], fd.Y[it * fd.nrp + fd.nr]]]); ctx.stroke(); }
+  }
+  path(voussoirPoly(g, i, p => p), true); ctx.strokeStyle = col.ink2; ctx.lineWidth = 1.2; ctx.stroke();
+  // isostatiche
+  if ($('v_iso').checked) {
+    const lines = isoLines(fd, g, 15);
+    ctx.strokeStyle = mode === 's2' ? 'rgba(255,255,255,.85)' : hexA(col.ink, 0.7); ctx.lineWidth = 1.3;
+    if (mode === 's2') { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 1.5; }
+    for (const L of lines) if (L.length > 1) { path(L); ctx.stroke(); }
+    ctx.shadowBlur = 0;
+  }
+  // linea delle pressioni nel concio e risultanti del campo
+  const lp = []; for (let q = 0; q <= 20; q++) { const cf = cutInVoussoir(g, i, q / 20), N = ev(cf.N, S.x), e = -ev(cf.M, S.x) / N; lp.push([cf.C[0] + e * cf.r[0], cf.C[1] + e * cf.r[1]]); }
+  ctx.strokeStyle = col.accent; ctx.lineWidth = 2.5; path(lp); ctx.stroke();
+  for (const c of fd.stats.cuts) { const q = T(c.P); ctx.beginPath(); ctx.arc(q[0], q[1], 4, 0, 7); ctx.fillStyle = col.s2; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = col.surface; ctx.stroke(); }
+  // diagrammi sulle facce
+  const smax = Math.max(1e-30, ...[fd.ctL, fd.ctR].map(c => isFinite(c.smax) ? c.smax : 0)), scl = 56 / tr.sc / smax;
+  const faceDiag = (j, N, Tt, ct, outward) => {
+    const C = g.C[j], r = g.r[j], t = g.t[j], o = outward, hh = g.h / 2;
+    if (!ct.trap && ct.a <= 1e-9 * g.h) {
+      const P = [C[0] + Math.sign(ct.e) * hh * r[0], C[1] + Math.sign(ct.e) * hh * r[1]], Q = [P[0] + o * 0.45 * g.h * t[0], P[1] + o * 0.45 * g.h * t[1]];
+      arrow(ctx, T(Q), T(P), col.crit, 2.2);
+      ctx.fillStyle = col.ink; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'center'; const q = T(Q); ctx.fillText('N concentrata', q[0], q[1] + (ct.e > 0 ? -8 : 14));
+      return;
+    }
+    const pts = [[C[0] - hh * r[0], C[1] - hh * r[1]]], tp = [];
+    for (let k = 0; k <= 40; k++) {
+      const y = -hh + g.h * k / 40, sv = sigmaAt(ct, N, g.h, y), tv = Tt / N * sv;
+      pts.push([C[0] + y * r[0] + o * sv * scl * t[0], C[1] + y * r[1] + o * sv * scl * t[1]]);
+      tp.push([C[0] + y * r[0] + o * tv * scl * t[0], C[1] + y * r[1] + o * tv * scl * t[1]]);
+    }
+    pts.push([C[0] + hh * r[0], C[1] + hh * r[1]]);
+    path(pts, true); ctx.fillStyle = hexA(col.accent, 0.18); ctx.fill(); ctx.strokeStyle = col.accent; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.setLineDash([3, 3]); ctx.strokeStyle = col.ink2; path(tp); ctx.stroke(); ctx.setLineDash([]);
+    const yM = ct.trap ? Math.sign(ct.e || 1) * hh : Math.sign(ct.e) * hh, q = T([C[0] + yM * r[0] + o * ct.smax * scl * t[0], C[1] + yM * r[1] + o * ct.smax * scl * t[1]]);
+    ctx.fillStyle = col.ink; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = o < 0 ? 'right' : 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(fmt(MPa(ct.smax), 2) + ' MPa', q[0] + (o < 0 ? -4 : 4), q[1]);
+  };
+  faceDiag(i - 1, fd.NL, fd.TL, fd.ctL, -1); faceDiag(i, fd.NR, fd.TR, fd.ctR, 1);
+  // marcatori dei massimi
+  const st = fd.stats;
+  const mark = (P, color, label, shape) => {
+    if (!P) return; const q = T(P); ctx.beginPath();
+    if (shape === 'tri') { ctx.moveTo(q[0], q[1] - 6); ctx.lineTo(q[0] + 5.5, q[1] + 4); ctx.lineTo(q[0] - 5.5, q[1] + 4); }
+    else { ctx.moveTo(q[0], q[1] - 6); ctx.lineTo(q[0] + 6, q[1]); ctx.lineTo(q[0], q[1] + 6); ctx.lineTo(q[0] - 6, q[1]); }
+    ctx.closePath(); ctx.fillStyle = color; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = col.surface; ctx.stroke();
+    ctx.fillStyle = col.ink; ctx.font = '600 11px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, q[0] + 9, q[1]);
+  };
+  mark(st.s2loc, col.ink, 'σ₂ min ' + fmt(MPa(st.s2min), 2), 'tri');
+  if (st.s1in > 0) mark(st.s1inloc, col.crit, 'σ₁ max ' + fmt(MPa(st.s1in), 3), 'dia');
+  ctx.fillStyle = col.ink2; ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText(`giunto ${jn(g, i - 1)}`, 6, 6); ctx.textAlign = 'right'; ctx.fillText(`giunto ${jn(g, i)}`, W - 6, 6);
+  if (title) { ctx.textAlign = 'center'; ctx.fillText(title, W / 2, 6); }
+}
+function colorbarHTML(mode, sc) {
+  const col = cssVars(), css = c => `rgb(${c.map(Math.round).join(',')})`;
+  let grad, lo, hi, lab;
+  if (mode === 's2') { grad = col.seq.map((c, k) => `${css(c)} ${(k / (col.seq.length - 1) * 100).toFixed(0)}%`).join(','); lo = '0'; hi = '−' + fmt(MPa(sc.neg), 2) + ' MPa (e oltre)'; lab = 'σ₂ compressione'; }
+  else { grad = `${col.neg},${col['div-mid']},${col.pos}`; lo = '−' + fmt(MPa(sc.neg), 2); hi = '+' + fmt(MPa(sc.pos), 3) + ' MPa'; lab = { s1: 'σ₁ (− compr. / + traz.)', stt: 'σ tangenziale (− compr. / + traz.)', tau: 'τ nel riferimento (t, r)' }[mode]; }
+  let html = `<span>${lab}</span><span>${lo}</span><span class="grad" style="background:linear-gradient(90deg,${grad})"></span><span>${hi}</span>`;
+  if (mode !== 's2') html += '<span class="unit">(scale dei due rami indipendenti, saturate al 98° percentile)</span>';
+  if (mode === 's2' && $('v_tens').checked) html += `<span style="display:inline-flex;align-items:center;gap:5px"><i class="dot" style="background:${col.pos}"></i>zone tese σ₁ &gt; 0 (fino a ${fmt(MPa(sc.s1pos), 3)} MPa)</span>`;
+  return html;
+}
+function tile(k, v, s, flag) { return `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${s ? `<div class="s">${s}</div>` : ''}${flag || ''}</div>`; }
+function vousStats(S, fd) {
+  const g = S.g, P = S.P, st = fd.stats, i = fd.i;
+  const fm = P.fm, ft = P.ft;
+  const flagC = -st.s2min > fm ? `<span class="flag bad">▲ supera fm</span>` : `<span class="flag ok">✓ sotto fm</span>`;
+  const flagT = st.s1in > ft ? `<span class="flag bad">▲ splitting oltre ft</span>` : `<span class="flag ok">✓ sotto ft</span>`;
+  const conc = fd.ctL.point || fd.ctR.point || (!fd.ctL.trap && fd.ctL.a < 0.05 * g.h) || (!fd.ctR.trap && fd.ctR.a < 0.05 * g.h);
+  const fc = (ct, N) => ct.trap ? 'tutta compressa' : (ct.a <= 1e-9 * g.h ? 'cerniera (N concentrata)' : `parzializzata, a/h = ${fmt(ct.a / g.h, 2)}`);
+  let h = '';
+  h += tile('σ₂ min (compressione max)', fmt(MPa(st.s2min), 2) + ' MPa', `fm = ${fmt(MPa(fm), 1)} MPa${conc ? ' · contatto concentrato: valore dipendente dalla mesh' : ''}`, flagC);
+  h += tile('σ₁ max interno (splitting)', fmt(MPa(st.s1in), 3) + ' MPa', `ft = ${fmt(MPa(ft), 2)} MPa · a più di 0,15h dalle facce`, flagT);
+  h += tile('σ₁ max assoluto', fmt(MPa(st.s1max), 3) + ' MPa', 'compresi i bordi caricati');
+  h += tile(`faccia ${jn(g, i - 1)}`, `N = ${fmt(fd.NL, 1)} kN`, `e/(h/2) = ${fmt(fd.ctL.e / (g.h / 2), 3)} · ${fc(fd.ctL)}`);
+  h += tile(`faccia ${jn(g, i)}`, `N = ${fmt(fd.NR, 1)} kN`, `e/(h/2) = ${fmt(fd.ctR.e / (g.h / 2), 3)} · ${fc(fd.ctR)}`);
+  h += tile('risultante campo vs linea', `Δe/h = ${fmtE(st.de)}`, `ΔN/N = ${fmtE(st.dN)} su 9 tagli radiali`);
+  if (fd.kind === 'fem') {
+    const rm = Math.max(...fd.reac.map(Math.abs)) / Math.max(fd.NL, fd.NR);
+    h += tile('reazioni dei 3 vincoli', fmtE(rm), `max |R| / N · mesh ${fd.nr}×${fd.nt}, ${fd.ndof} gdl`, rm < 1e-3 ? '<span class="flag ok">✓ ≈ 0, carico autoequilibrato</span>' : '<span class="flag bad">▲ non nulle</span>');
+  }
+  h += tile('peso del concio', fmt(g.W, 2) + ' kN', `Gᵢ a r = ${fmt(Math.hypot(...g.G[i]), 4)} m · lunghezza R·Δθ = ${fmt(g.R * g.dth, 3)} m ≈ ${fmt(g.dth * g.R / g.h, 2)} h`);
+  return h;
+}
+function drawVoussoirs() {
+  const S = ui.S, box = $('vwrap');
+  if (!S || S.fail || !ui.fd || ui.fd.fail) {
+    $('vStats').innerHTML = S && !S.fail && ui.fd && ui.fd.fail ? `<div class="msg crit">${ui.fd.fail}</div>` : '';
+    $('cbar').innerHTML = ''; const { ctx, W, H } = setupCanvas($('cvV'), 120); ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = cssVars().muted; ctx.font = '13px system-ui,sans-serif'; ctx.fillText('Nessun campo da mostrare.', 10, 30);
+    $('vBoxA').hidden = true; box.classList.remove('cmp'); return;
+  }
+  const mode = $('v_map').value, haveA = ui.A && ui.fdA && !ui.fdA.fail;
+  $('vBoxA').hidden = !haveA; box.classList.toggle('cmp', !!haveA);
+  const sc = mapScale(mode, haveA ? [ui.fd, ui.fdA] : [ui.fd]);
+  drawVoussoir($('cvV'), S, ui.fd, sc);
+  if (haveA) { drawVoussoir($('cvVA'), ui.A.S, ui.fdA, sc); $('vLabA').textContent = 'Stato A · ' + ui.A.desc; $('vLabB').textContent = 'Stato corrente · ' + stateDesc(S); }
+  else $('vLabB').textContent = '';
+  $('vLabB').hidden = !haveA;
+  $('cbar').innerHTML = colorbarHTML(mode, sc) + (haveA ? '<span class="unit">· stessa scala nei due stati</span>' : '');
+  $('vStats').innerHTML = vousStats(S, ui.fd);
+}
+function stateDesc(S) {
+  const m = { hc: 'Heyman λc', hs: 'Heyman centrata', uj: 'giunti deformabili', ub: 'conci+giunti deformabili' }[S.p.model];
+  let d = `${m}, λ = ${fmt(S.lam, 3)}`;
+  if ((S.p.model === 'uj' || S.p.model === 'ub') && S.p.abut === 'settle') d += `, Δx = ${fmt(S.p.dx, 2)} mm`;
+  if ((S.p.model === 'uj' || S.p.model === 'ub') && S.p.abut === 'spring') d += ', molle';
+  return d;
+}
+
+/* ---------- tabella, controlli, testo di stato ---------- */
+function drawTable() {
+  const S = ui.S, el = $('jointTable');
+  if (!S || S.fail) { el.innerHTML = '<p class="note">—</p>'; return; }
+  const g = S.g, col = cssVars();
+  let h = '<table><thead><tr><th>giunto</th><th>φ [°]</th><th>N [kN]</th><th>T [kN]</th><th>M [kNm]</th><th>e/(h/2)</th><th>a/h compressa</th><th>σmax [MPa]</th><th>|T|/N</th><th>u* / (tg/Em·γ²R³)</th><th>stato</th></tr></thead><tbody>';
+  S.joints.forEach((jr, j) => {
+    const stt = STATE[jr.state], sel = ui.sel && (j === ui.sel - 1 || j === ui.sel);
+    h += `<tr class="${sel ? 'selj' : ''}"><td>${jn(g, j)}</td><td>${fmt(g.phi[j] / D2R, 1)}</td><td>${fmt(jr.N, 2)}</td><td>${fmt(jr.T, 2)}</td><td>${fmt(jr.M, 3)}</td>`
+      + `<td>${fmt(jr.ratio, 3)}</td><td>${jr.ct.ok ? fmt(jr.ct.a / g.h, 3) : '—'}</td><td>${jr.ct.ok ? fmt(MPa(jr.ct.smax), 3) : '—'}</td><td>${fmt(Math.abs(jr.T) / jr.N, 3)}</td>`
+      + `<td>${fmt(jr.ustar / (g.gam * g.gam * g.R ** 3), 4)}</td><td class="st"><span style="color:${col[stt.c]}">${stt.ico}</span> ${stt.lab}${jr.slide && jr.hinge ? ' + scorrimento' : ''}</td></tr>`;
+  });
+  h += '</tbody></table>';
+  const x = S.x, sc = g.gam * g.R * g.R;
+  h += `<p class="note">Iperstatiche: H₀ = ${fmt(x[0], 3)} kN (${fmt(x[0] / sc, 4)} γR²) · V₀ = ${fmt(x[1], 3)} kN (${fmt(x[1] / sc, 4)} γR²) · M₀ = ${fmt(x[2], 4)} kNm (${fmt(x[2] / (sc * g.R), 5)} γR³). `
+    + `Σu*/(tg/Em·γ²R³) = ${fmt(S.Uadim, 4)}${S.min ? ` · Π* al minimo = ${fmtE(S.min.f, 3)} kNm, U* = ${fmtE(S.min.U, 3)} kNm` : ''}. `
+    + `Cerniera: ${S.hingeTol < 0.99 ? '|e|/(h/2) ≥ 0,95 (nel modello deformabile la cerniera è un limite)' : '|e| = h/2'} · parzializzato: |e| > h/6.</p>`;
+  el.innerHTML = h;
+}
+function drawChecks() {
+  const S = ui.S, el = $('checks');
+  if (!S || S.fail) { el.innerHTML = '<p class="note">—</p>'; return; }
+  const ok = (c, txt) => `<span class="${c ? 'ok' : 'bad'}">${c ? '✓' : '▲'} ${txt}</span>`;
+  const rows = [];
+  rows.push(['Equilibrio di ogni concio', `forze ${fmtE(S.eqRes.f)} W, momenti ${fmtE(S.eqRes.m)} W·R`, ok(S.eqRes.f < 1e-9 && S.eqRes.m < 1e-9, 'residuo ≈ 0')]);
+  const adm = S.joints.every(j => j.ct.ok && Math.abs(j.ratio) <= 1 + 1e-6);
+  rows.push(['Ammissibilità (N ≥ 0, |e| ≤ h/2)', `max |e|/(h/2) = ${fmt(Math.max(...S.joints.map(j => Math.abs(j.ratio))), 5)}`, ok(adm, adm ? 'linea dentro lo spessore' : 'violata')]);
+  if (S.mu != null) { const mx = Math.max(...S.joints.map(j => Math.abs(j.T) / j.N)); rows.push(['Attrito |T| ≤ μN', `max |T|/N = ${fmt(mx, 4)} (μ = ${fmt(S.mu, 2)})`, ok(mx <= S.mu * (1 + 1e-6) || S.model === 'uj' || S.model === 'ub', mx <= S.mu * (1 + 1e-6) ? 'rispettato' : 'superato: scorrimento (nel modello deformabile solo segnalato)')]); }
+  if (S.lcFinite) rows.push(['Moltiplicatore di collasso (statico)', `λc = ${fmt(S.lc.lam, 4)}${S.mu != null ? ' con attrito' : ''}`, '']);
+  if (S.mech) rows.push(['Verifica cinematica (PLV)', S.mech.ok ? `λcin = ${fmt(S.mech.lamCin, 4)} · cerniere ai giunti ${S.mech.hj.map(j => jn(S.g, j) + (S.joints[j].e > 0 ? ' (estr.)' : ' (intr.)')).join(', ')}` : S.mech.msg,
+    S.mech.ok ? ok(Math.abs(S.mech.lamCin - S.lam) < 1e-6 * Math.max(1, S.lam) && S.mech.coerente, Math.abs(S.mech.lamCin - S.lam) < 1e-6 * Math.max(1, S.lam) ? `λcin = λc${S.mech.coerente ? ', rotazioni coerenti' : ', ma segni delle rotazioni incoerenti'}` : 'λcin ≠ λc') : '']);
+  if (S.min) {
+    const gnorm = Math.hypot(S.min.grad[0] * S.g.Wtot, S.min.grad[1] * S.g.Wtot, S.min.grad[2] * S.g.Wtot * S.g.R) / Math.max(1e-300, Math.abs(S.min.U));
+    rows.push(['Minimo di Π* (Newton)', `${S.min.it} iterazioni · |∇Π*|·scala / U* = ${fmtE(gnorm)}`, ok(gnorm < 1e-6, 'convergito')]);
+  }
+  if (S.def) rows.push(['Congruenza alla spalla destra', `scarto ${fmtE(S.def.compat)} dello spostamento massimo (cascata di Castigliano: δ = ∂u*/∂N, Δφ = −∂u*/∂M)`, ok(S.def.compat < 1e-5, '∂Π*/∂X = 0 ⇔ congruenza')]);
+  if (ui.fd && !ui.fd.fail) {
+    const fd = ui.fd, st = fd.stats;
+    if (fd.kind === 'fem') { const rm = Math.max(...fd.reac.map(Math.abs)) / Math.max(fd.NL, fd.NR); rows.push([`FEM concio ${fd.i}: reazioni dei vincoli`, `max |R|/N = ${fmtE(rm)}`, ok(rm < 1e-3, '≈ 0 (forze autoequilibrate)')]); }
+    rows.push([`Concio ${fd.i}: risultante del campo = linea`, `Δe/h = ${fmtE(st.de)}, ΔN/N = ${fmtE(st.dN)}`, ok(st.de < 0.02 && st.dN < 0.02, 'coincidono (a meno della discretizzazione)')]);
+  }
+  el.innerHTML = '<div class="tablewrap"><table class="checks"><thead><tr><th>controllo</th><th>valore</th><th>esito</th></tr></thead><tbody>'
+    + rows.map(r => `<tr><td>${r[0]}</td><td style="white-space:normal">${r[1]}</td><td style="white-space:normal">${r[2]}</td></tr>`).join('') + '</tbody></table></div>';
+}
+function refreshLabels(p, S) {
+  $('o_theta0').textContent = p.theta0 + '°'; $('o_hR').textContent = fmt(p.hR, 4); $('o_n').textContent = p.n;
+  const g = S.g;
+  $('geoInfo').innerHTML = `<span>h = ${fmt(g.h, 3)} m</span><span>Δθ = ${fmt(g.dth / D2R, 2)}°</span><span>luce l = ${fmt(g.luce, 2)} m</span><span>freccia f = ${fmt(g.freccia, 2)} m</span><span>Wᵢ = ${fmt(g.W, 2)} kN</span><span>W tot = ${fmt(g.Wtot, 1)} kN</span>`;
+  const hc = p.model === 'hc';
+  $('p_frac').disabled = hc; $('btnAnim').disabled = hc;
+  const fin = S.lcFinite;
+  $('l_frac').textContent = fin || S.fail ? 'λ / λc' : `λ / ${LAMBDA_NO_MECH}`;
+  $('o_frac').textContent = hc ? '1' : fmt(p.frac, 3);
+  let li = '';
+  if (S.lc && S.lc.status === 'ok') li += `<span>λc = ${fmt(S.lc.lam, 4)}</span>`;
+  else if (S.lc && S.lc.status === 'unbounded') li += `<span>λc &gt; ${LMAX} (nessun meccanismo)</span>`;
+  if (!S.fail) li += `<span>λ = ${fmt(S.lam, 4)}</span>`;
+  if (!S.fail && p.model !== 'hs' && p.model !== 'hc' && p.frac > 0.995 && fin) li += '<span style="grid-column:1/-1">min U* limitato a 0,995·λc</span>';
+  $('lamInfo').innerHTML = li;
+  const P = S.P, alpha = (P.Eb / P.Em) * (P.tg / (g.R * g.dth));
+  $('defInfo').innerHTML = `<span>α = ${fmt(alpha, 3)}</span><span>tg/Em = ${fmtE(P.tg / P.Em, 2)} m/kPa</span>`;
+  const defm = p.model === 'uj' || p.model === 'ub';
+  $('c_abut').classList.toggle('dis', !defm);
+  $('g_spring').hidden = p.abut !== 'spring'; $('g_settle').hidden = p.abut !== 'settle';
+  $('r_mu').classList.toggle('dis', !p.muOn);
+  $('modelNote').textContent = {
+    hc: 'Teorema statico: max λ con |M| ≤ N·h/2 (e |T| ≤ μN) in ogni giunto. A λc la linea è unica e tocca i lembi in 4 cerniere alternate.',
+    hs: 'Per λ < λc le linee ammissibili sono infinite: si sceglie quella con il massimo margine dai lembi. Le grigie sono altri vertici del dominio (spinta minima e massima comprese).',
+    uj: 'Conci rigidi, giunti di malta elastici non reagenti a trazione: la linea vera minimizza U* = Σu*(N, M). Se tg/Em è uguale in tutti i giunti la linea dipende solo dalla geometria.',
+    ub: 'Si aggiunge l\'energia dei conci come trave curva: ∫[N²/(2EbA) + M²/(2EbI)] ds. Il rapporto α decide chi comanda.'
+  }[p.model];
+  $('lg_alt').style.display = p.model === 'hc' ? 'none' : '';
+  $('lineName').textContent = S.fail ? '' : S.lineName;
+  $('status').textContent = S.fail ? '' : `λc = ${fin ? fmt(S.lc.lam, 4) : '∞'} · λ = ${fmt(S.lam, 4)} · parzializzati ${S.joints.filter(j => j.part && !j.hinge).length} · cerniere ${S.joints.filter(j => j.hinge).length}`;
+}
+
+/* ---------- grafici in λ ---------- */
+function runSweep() {
+  const p0 = readParams(), model = p0.model === 'hc' ? 'hs' : p0.model, out = { fr: [], lam: [], ratio: [], U: [], smax: [], split: [], npart: [], nhinge: [], model };
+  const S0 = solveAll(Object.assign({}, p0, { model, frac: 0 })); if (S0.fail) return { fail: S0.fail };
+  const n = S0.g.n;
+  for (let k = 0; k <= 25; k++) {
+    const fr = Math.min(0.99, k / 25 * 0.99 / 0.99 * (k === 25 ? 0.99 : 1));
+    const S = solveAll(Object.assign({}, p0, { model, frac: k === 25 ? 0.99 : k / 25 })); if (S.fail) continue;
+    out.fr.push(k === 25 ? 0.99 : k / 25); out.lam.push(S.lam);
+    out.ratio.push(S.joints.map(j => j.ratio));
+    out.U.push(S.Uadim);
+    out.smax.push(MPa(Math.max(...S.joints.map(j => isFinite(j.ct.smax) ? j.ct.smax : 0))));
+    let sp = -Infinity; for (let i = 1; i <= n; i++) { const fd = voussoirField(S, i, 'fem', 8); if (fd && !fd.fail) sp = Math.max(sp, fd.stats.s1in); }
+    out.split.push(MPa(sp));
+    out.npart.push(S.joints.filter(j => j.part && !j.hinge).length); out.nhinge.push(S.joints.filter(j => j.hinge).length);
+    void fr;
+  }
+  out.n = n; out.g = S0.g; out.lcFinite = S0.lcFinite; out.fm = S0.P.fm / 1000; out.ft = S0.P.ft / 1000;
+  return out;
+}
+function niceTicks(lo, hi, k = 5) {
+  const span = hi - lo || 1, step0 = span / k, mag = 10 ** Math.floor(Math.log10(step0)), r = step0 / mag;
+  const step = (r < 1.5 ? 1 : r < 3 ? 2 : r < 7 ? 5 : 10) * mag, t = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9 * step; v += step) t.push(Math.abs(v) < 1e-12 * step ? 0 : v);
+  return t;
+}
+function lineChart(cv, cfg) {
+  const { ctx, W, H } = setupCanvas(cv, 210), col = cssVars(), m = { l: 50, r: 14, t: 12, b: 32 };
+  ctx.clearRect(0, 0, W, H);
+  let lo = Infinity, hi = -Infinity;
+  for (const s of cfg.series) for (const v of s.y) if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  for (const r of cfg.refs || []) if (isFinite(r.y) && r.y < hi * 4) { lo = Math.min(lo, r.y); hi = Math.max(hi, r.y); }
+  if (cfg.zero) lo = Math.min(lo, 0);
+  if (!isFinite(lo)) { lo = 0; hi = 1; } if (hi - lo < 1e-12) { hi = lo + 1; }
+  const pad = (hi - lo) * 0.06; hi += pad; if (!cfg.zero || lo < 0) lo -= pad;
+  const x0 = cfg.x[0], x1 = cfg.x[cfg.x.length - 1];
+  const X = v => m.l + (v - x0) / (x1 - x0 || 1) * (W - m.l - m.r), Y = v => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
+  ctx.font = '11px system-ui,sans-serif'; ctx.fillStyle = col.muted; ctx.strokeStyle = col.grid; ctx.lineWidth = 1;
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const t of niceTicks(lo, hi, 4)) { const y = Math.round(Y(t)) + 0.5; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(W - m.r, y); ctx.stroke(); ctx.fillText(fmt(t, cfg.dec != null ? cfg.dec : 2), m.l - 6, y); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const t of niceTicks(x0, x1, 5)) ctx.fillText(fmt(t, 2), X(t), H - m.b + 6);
+  ctx.strokeStyle = col.axis; ctx.beginPath(); ctx.moveTo(m.l, H - m.b + 0.5); ctx.lineTo(W - m.r, H - m.b + 0.5); ctx.stroke();
+  ctx.fillText(cfg.xLabel, (m.l + W - m.r) / 2, H - 14);
+  for (const r of cfg.refs || []) {
+    if (!(r.y >= lo && r.y <= hi)) continue; const y = Y(r.y);
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = col.ink2; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(W - m.r, y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = col.ink2; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(r.label, W - m.r - 2, y - 2);
+  }
+  for (const s of cfg.series) {
+    ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.beginPath(); let pen = false;
+    s.y.forEach((v, k) => { if (!isFinite(v)) { pen = false; return; } const px = X(cfg.x[k]), py = Y(v); if (s.step && pen) ctx.lineTo(px, ctx._ly); pen ? ctx.lineTo(px, py) : ctx.moveTo(px, py); ctx._ly = py; pen = true; });
+    ctx.stroke();
+    if (cfg.series.length > 1) {
+      const k = s.y.length - 1; ctx.fillStyle = col.ink2; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+      if (isFinite(s.y[k])) ctx.fillText(s.name, X(cfg.x[k]) - 4, Y(s.y[k]) - 3 + (s.labOff || 0));
+    }
+  }
+  if (cfg.hover != null) {
+    const k = cfg.hover, px = X(cfg.x[k]);
+    ctx.strokeStyle = col.axis; ctx.beginPath(); ctx.moveTo(px + 0.5, m.t); ctx.lineTo(px + 0.5, H - m.b); ctx.stroke();
+    for (const s of cfg.series) if (isFinite(s.y[k])) { ctx.beginPath(); ctx.arc(px, Y(s.y[k]), 4.5, 0, 7); ctx.fillStyle = s.color; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = col.surface; ctx.stroke(); }
+  }
+  cv._chart = { cfg, X, m, W };
+}
+function heatmap(cv, sw, hover) {
+  const n = sw.n, nx = sw.fr.length, rowH = Math.max(4, Math.min(16, Math.floor(260 / (n + 1)))), m = { l: 50, r: 14, t: 8, b: 32 };
+  const H = m.t + m.b + rowH * (n + 1), { ctx, W } = setupCanvas(cv, H), col = cssVars();
+  ctx.clearRect(0, 0, W, H);
+  const cw = (W - m.l - m.r) / nx, mid = hex2rgb(col['div-mid']), neg = hex2rgb(col.neg), pos = hex2rgb(col.pos);
+  for (let k = 0; k < nx; k++) for (let j = 0; j <= n; j++) {
+    const v = sw.ratio[k][j], c = v < 0 ? rampC([mid, neg], -v) : rampC([mid, pos], v);
+    ctx.fillStyle = `rgb(${c.map(Math.round).join(',')})`;
+    ctx.fillRect(m.l + k * cw + 1, m.t + j * rowH + 1, cw - 2, rowH - 2);
+    if (Math.abs(v) >= 0.95) { ctx.strokeStyle = col.ink; ctx.lineWidth = 1.5; ctx.strokeRect(m.l + k * cw + 1.5, m.t + j * rowH + 1.5, cw - 3, rowH - 3); }
+  }
+  ctx.font = '11px system-ui,sans-serif'; ctx.fillStyle = col.muted; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  const every = Math.ceil((n + 1) / 12);
+  for (let j = 0; j <= n; j += every) ctx.fillText(jn(sw.g, j), m.l - 6, m.t + (j + 0.5) * rowH);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) { const k = Math.round(t * (nx - 1)); ctx.fillText(fmt(sw.fr[k], 2), m.l + (k + 0.5) * cw, H - m.b + 6); }
+  ctx.fillText(sw.lcFinite ? 'λ / λc' : `λ / ${LAMBDA_NO_MECH}`, (m.l + W - m.r) / 2, H - 14);
+  if (hover) { ctx.strokeStyle = col.ink; ctx.lineWidth = 2; ctx.strokeRect(m.l + hover.k * cw + 0.5, m.t + hover.j * rowH + 0.5, cw - 1, rowH - 1); }
+  cv._heat = { m, cw, rowH, nx, n };
+}
+function drawCharts(hov) {
+  const sw = ui.sweep, el = $('charts');
+  if (!sw) { el.innerHTML = ''; return; }
+  if (sw.fail) { el.innerHTML = `<div class="msg crit">${sw.fail}</div>`; return; }
+  if (!el.childElementCount) {
+    const col = cssVars();
+    el.innerHTML = `
+      <div class="chart"><h4>e/(h/2) in ogni giunto</h4><p class="cap"><span style="color:${col.neg}">■</span> −1 intradosso · grigio 0 = baricentrica · <span style="color:${col.pos}">■</span> +1 estradosso · riquadro = cerniera (≥ 0,95)</p><canvas id="ch_heat"></canvas></div>
+      <div class="chart"><h4>${sw.model === 'hs' ? 'Σu* della linea più centrata' : 'U* minimo'}</h4><p class="cap">in unità tg/Em · γ²R³ (solo giunti)</p><canvas id="ch_U"></canvas></div>
+      <div class="chart"><h4>σmax di compressione sui giunti</h4><p class="cap">MPa · distribuzione trapezia/triangolare del cap. 5.1</p><canvas id="ch_s"></canvas></div>
+      <div class="chart"><h4>Trazione di splitting massima nei conci</h4><p class="cap">MPa · σ₁ max interno dal FEM (mesh grossa), tutti i conci</p><canvas id="ch_sp"></canvas></div>
+      <div class="chart"><h4>Giunti parzializzati e cerniere</h4><p class="cap"><span style="color:${col.warn}">■</span> parzializzati · <span style="color:${col.crit}">■</span> cerniere</p><canvas id="ch_n"></canvas></div>`;
+    for (const id of ['ch_U', 'ch_s', 'ch_sp', 'ch_n']) {
+      const cv = $(id);
+      cv.addEventListener('mousemove', e => { const c = cv._chart; if (!c) return; const r = cv.getBoundingClientRect(), px = e.clientX - r.left; let best = 0; c.cfg.x.forEach((v, k) => { if (Math.abs(c.X(v) - px) < Math.abs(c.X(c.cfg.x[best]) - px)) best = k; }); drawCharts({ id, k: best }); showTip(e.clientX, e.clientY, c.cfg.tip(best)); });
+      cv.addEventListener('mouseleave', () => { drawCharts(null); hideTip(); });
+    }
+    const hv = $('ch_heat');
+    hv.addEventListener('mousemove', e => { const c = hv._heat; if (!c) return; const r = hv.getBoundingClientRect(), k = Math.floor((e.clientX - r.left - c.m.l) / c.cw), j = Math.floor((e.clientY - r.top - c.m.t) / c.rowH); if (k < 0 || k >= c.nx || j < 0 || j > c.n) { hideTip(); drawCharts(null); return; } drawCharts({ id: 'ch_heat', k, j }); showTip(e.clientX, e.clientY, `<b>giunto ${jn(sw.g, j)}</b><br>λ/λc = ${fmt(sw.fr[k], 2)} (λ = ${fmt(sw.lam[k], 3)})<br>e/(h/2) = ${fmt(sw.ratio[k][j], 3)}`); });
+    hv.addEventListener('mouseleave', () => { drawCharts(null); hideTip(); });
+  }
+  const col = cssVars(), xl = sw.lcFinite ? 'λ / λc' : `λ / ${LAMBDA_NO_MECH}`, H = k => hov && hov.id && hov.k !== undefined ? hov.k : null;
+  const hk = id => hov && hov.id === id ? hov.k : null;
+  heatmap($('ch_heat'), sw, hov && hov.id === 'ch_heat' ? hov : null);
+  lineChart($('ch_U'), { x: sw.fr, xLabel: xl, series: [{ name: 'U*', y: sw.U, color: col.accent }], hover: hk('ch_U'), dec: 2, zero: true, tip: k => `λ/λc = ${fmt(sw.fr[k], 2)}<br><b>U* = ${fmt(sw.U[k], 4)}</b>` });
+  lineChart($('ch_s'), { x: sw.fr, xLabel: xl, series: [{ name: 'σmax', y: sw.smax, color: col.accent }], refs: [{ y: sw.fm, label: 'fm' }], hover: hk('ch_s'), dec: 2, zero: true, tip: k => `λ/λc = ${fmt(sw.fr[k], 2)}<br><b>σmax = ${fmt(sw.smax[k], 3)} MPa</b><br>fm = ${fmt(sw.fm, 2)} MPa` });
+  lineChart($('ch_sp'), { x: sw.fr, xLabel: xl, series: [{ name: 'σ₁', y: sw.split, color: col.accent }], refs: [{ y: sw.ft, label: 'ft' }], hover: hk('ch_sp'), dec: 3, zero: true, tip: k => `λ/λc = ${fmt(sw.fr[k], 2)}<br><b>σ₁ splitting = ${fmt(sw.split[k], 4)} MPa</b><br>ft = ${fmt(sw.ft, 2)} MPa` });
+  lineChart($('ch_n'), { x: sw.fr, xLabel: xl, series: [{ name: 'parzializzati', y: sw.npart, color: col.warn, step: true }, { name: 'cerniere', y: sw.nhinge, color: col.crit, step: true, labOff: 14 }], hover: hk('ch_n'), dec: 0, zero: true, tip: k => `λ/λc = ${fmt(sw.fr[k], 2)}<br>parzializzati: <b>${sw.npart[k]}</b><br>cerniere: <b>${sw.nhinge[k]}</b>` });
+  void H;
+}
+function showTip(x, y, html) { const t = $('tip'); t.innerHTML = html; t.style.display = 'block'; const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.min(window.innerWidth - w - 8, x + 14) + 'px'; t.style.top = Math.max(8, y - h - 10) + 'px'; }
+function hideTip() { $('tip').style.display = 'none'; }
+
+/* ---------- validazione con i numeri del cap. 4 ---------- */
+function validate() {
+  const base = { hR: 0.15, n: 7, R: 1, gamma: 1 }, rows = [];
+  const lcOf = (o, mu) => lpLambdaC(makeGeom(Object.assign({}, base, o)), mu);
+  const cmp = (calc, ref, tol) => !isFinite(ref) ? (!isFinite(calc) ? '<span class="ok">✓</span>' : '<span class="bad">▲</span>') : (Math.abs(calc - ref) <= tol ? '<span class="ok">✓</span>' : '<span class="bad">▲</span>');
+  for (const [th, ref] of [[180, 0.167], [150, 0.444], [120, 0.952], [90, 2.38], [60, Infinity]]) {
+    const r = lcOf({ theta0: th }, null), v = r.status === 'ok' ? r.lam : Infinity;
+    rows.push([`λc Heyman, θ₀ = ${th}°`, fmt(v, 4), isFinite(ref) ? fmt(ref, 3) : '∞', cmp(v, ref, isFinite(ref) ? 0.0051 * Math.max(1, ref) : 0)]);
+  }
+  { const r = lcOf({ theta0: 180, n: 60 }, null); rows.push(['λc Heyman, θ₀ = 180°, n = 60', fmt(r.lam, 4), '0,145', cmp(r.lam, 0.145, 0.0015)]); }
+  { const g = makeGeom(Object.assign({}, base, { theta0: 180 })), r = lpLambdaC(g, null), S = { joints: jointResults(g, r.x, null, 1 - 1e-6) };
+    const hs = S.joints.map((j, k) => j.hinge ? `${jn(g, k)} ${j.e > 0 ? 'estr.' : 'intr.'}` : null).filter(Boolean).join(', ');
+    rows.push(['Cerniere a λc (θ₀ = 180°)', hs, '01 estr., 23 intr., 45 estr., 67 intr.', hs === '01 estr., 23 intr., 45 estr., 67 intr.' ? '<span class="ok">✓</span>' : '<span class="bad">▲</span>']); }
+  for (const [th, ref] of [[105, 1.33], [90, 2.13], [75, 4.65], [120, 0.952]]) {
+    const r = lcOf({ theta0: th }, 0.6); rows.push([`λc con μ = 0,6, θ₀ = ${th}°`, fmt(r.lam, 4), fmt(ref, 3), cmp(r.lam, ref, 0.0051 * Math.max(1, ref))]);
+  }
+  const hmin = n => { let a = 0.02, b = 0.3; for (let k = 0; k < 40; k++) { const c = (a + b) / 2, g = makeGeom({ theta0: 180, hR: c, n, R: 1, gamma: 1 }); lpFixed(g, 0, null, 'center') ? b = c : a = c; } return b; };
+  { const v = hmin(60); rows.push(['h/R minimo (λ = 0, θ₀ = 180°), n = 60', fmt(v, 4), '0,1075', cmp(v, 0.1075, 0.0006)]); }
+  { const v = hmin(7); rows.push(['h/R minimo (λ = 0, θ₀ = 180°), n = 7', fmt(v, 4), '0,096', cmp(v, 0.096, 0.0006)]); }
+  { const p = Object.assign({ theta0: 180, model: 'uj', frac: 0, muOn: false, mu: 0.6, Em: 1e-6, tg: 1000, Eb: 30, nu: 0.2, abut: 'rigid', kx: 1, ky: 1, kphi: 1, dx: 0, dy: 0, dphi: 0, fm: 6, ft: .3 }, base);
+    // tg/Em = 1 in unità interne
+    const S = solveAll(p);
+    if (!S.fail) {
+      const x = S.x, ratios = S.joints.map(j => fmt(j.ratio, 3)).join(' · ');
+      rows.push(['min U*, λ = 0: H₀ / γR²', fmt(x[0], 4), '0,0886', cmp(x[0], 0.0886, 0.00006)]);
+      rows.push(['min U*, λ = 0: V₀ / γR²', fmt(x[1], 4), '0,2356', cmp(x[1], 0.2356, 0.00006)]);
+      rows.push(['min U*, λ = 0: M₀ / γR³', fmt(x[2], 5), '−0,00979', cmp(x[2], -0.00979, 0.000006)]);
+      rows.push(['min U*, λ = 0: e/(h/2) nei giunti 01…78', ratios, '+0,554 · −0,691 · −0,431 · +0,721 · +0,721 · −0,431 · −0,691 · +0,554', Math.abs(S.joints[0].ratio - 0.554) < 0.002 && Math.abs(S.joints[3].ratio - 0.721) < 0.002 ? '<span class="ok">✓</span>' : '<span class="bad">▲</span>']);
+      rows.push(['U* minimo (tg/Em · γ²R³)', fmt(S.Uadim, 4), '1,7995', cmp(S.Uadim, 1.7995, 0.0006)]);
+    }
+  }
+  $('valOut').innerHTML = '<div class="tablewrap"><table class="checks"><thead><tr><th>grandezza</th><th>calcolato</th><th>riferimento tesina</th><th></th></tr></thead><tbody>'
+    + rows.map(r => `<tr><td>${r[0]}</td><td style="white-space:normal">${r[1]}</td><td style="white-space:normal">${r[2]}</td><td>${r[3]}</td></tr>`).join('') + '</tbody></table></div>'
+    + '<p class="note">Tolleranza: ±0,5% (arrotondamento dei valori della tesina). Il λc con attrito resta una stima (legge non associata).</p>';
+}
+
+/* ---------- ciclo principale ---------- */
+let pending = false;
+function schedule(full = true) { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; update(full); }); }
+function update(full = true) {
+  const p = readParams();
+  const S = solveAll(p, { alt: $('v_alt').checked });
+  ui.S = S;
+  refreshLabels(p, S);
+  if (!S.fail) { if (!ui.sel || ui.sel > S.g.n) ui.sel = Math.ceil(S.g.n / 2); }
+  $('vName').textContent = S.fail ? '—' : `concio ${ui.sel} di ${S.g.n}`;
+  $('vInfo').textContent = S.fail ? '' : `ψ = ${fmt(S.g.psi[ui.sel] / D2R, 1)}° dalla verticale · giunti ${jn(S.g, ui.sel - 1)} e ${jn(S.g, ui.sel)}`;
+  const nr = ui.animLam ? 10 : parseInt($('v_mesh').value, 10), meth = $('v_method').value;
+  ui.fd = S.fail ? null : voussoirField(S, ui.sel, meth, nr);
+  ui.fdA = ui.A && !ui.A.S.fail && ui.sel <= ui.A.S.g.n ? voussoirField(ui.A.S, ui.sel, meth, nr) : null;
+  drawArch(); drawVoussoirs(); drawTable(); drawChecks();
+  const key = JSON.stringify(p);
+  if (ui.sweep && ui.sweepKey !== key) $('sweepNote').textContent = 'I parametri sono cambiati: ricalcola per aggiornare i grafici.';
+  void full;
+}
+
+function bind() {
+  for (const k of KEYS) $('p_' + k).addEventListener('input', () => schedule());
+  for (const id of ['p_model', 'p_abut', 'p_muOn', 'v_alt', 'v_method', 'v_mesh']) $(id).addEventListener('change', () => schedule());
+  for (const id of ['v_sig', 'v_res', 'v_def']) $(id).addEventListener('change', drawArch);
+  $('v_amp').addEventListener('input', drawArch);
+  for (const id of ['v_map', 'v_iso', 'v_tens', 'v_grid']) $(id).addEventListener('change', drawVoussoirs);
+  $('v_anim').addEventListener('change', () => {
+    if ($('v_anim').checked) { const t0 = performance.now(); const loop = () => { if (!$('v_anim').checked) { ui.defT = 1; drawArch(); return; } ui.defT = 0.5 - 0.5 * Math.cos((performance.now() - t0) / 700); drawArch(); requestAnimationFrame(loop); }; loop(); }
+  });
+  $('vPrev').onclick = () => { if (ui.S && !ui.S.fail) { ui.sel = Math.max(1, ui.sel - 1); update(); } };
+  $('vNext').onclick = () => { if (ui.S && !ui.S.fail) { ui.sel = Math.min(ui.S.g.n, ui.sel + 1); update(); } };
+  const cv = $('cvArch');
+  cv.addEventListener('click', e => { const pk = archPick(e); if (pk && pk.i) { ui.sel = pk.i; update(); } });
+  cv.addEventListener('mousemove', e => {
+    const pk = archPick(e), S = ui.S;
+    if (pk && pk.j >= 0 && S && !S.fail) {
+      const jr = S.joints[pk.j], st = STATE[jr.state], g = S.g;
+      showTip(pk.cx, pk.cy, `<b>giunto ${jn(g, pk.j)}</b> · ${st.ico} ${st.lab}<br>N = ${fmt(jr.N, 2)} kN · T = ${fmt(jr.T, 2)} kN<br>M = ${fmt(jr.M, 3)} kNm · e/(h/2) = <b>${fmt(jr.ratio, 3)}</b><br>zona compressa a/h = ${fmt(jr.ct.a / g.h, 3)} · σmax = ${fmt(MPa(jr.ct.smax), 3)} MPa`);
+    } else if (pk && pk.i && S && !S.fail) showTip(pk.cx, pk.cy, `concio ${pk.i} · clic per aprirlo`);
+    else hideTip();
+    const hj = pk ? pk.j : -1; if (hj !== ui.hoverJ) { ui.hoverJ = hj; drawArch(); }
+  });
+  cv.addEventListener('mouseleave', () => { hideTip(); if (ui.hoverJ !== -1) { ui.hoverJ = -1; drawArch(); } });
+  $('btnSnap').onclick = () => { if (!ui.S || ui.S.fail) return; ui.A = { S: ui.S, desc: stateDesc(ui.S) }; $('btnUnsnap').hidden = false; $('lg_A').hidden = false; update(); };
+  $('btnUnsnap').onclick = () => { ui.A = null; ui.fdA = null; $('btnUnsnap').hidden = true; $('lg_A').hidden = true; update(); };
+  $('btnAnim').onclick = () => {
+    if (ui.animLam) { cancelAnimationFrame(ui.animLam); ui.animLam = null; $('btnAnim').textContent = '▶ Anima 0 → λc'; update(); return; }
+    const t0 = performance.now(), dur = 6000; $('btnAnim').textContent = '■ Ferma';
+    const step = () => { const f = Math.min(1, (performance.now() - t0) / dur); $('p_frac').value = f.toFixed(3); update(); if (f < 1 && ui.animLam) ui.animLam = requestAnimationFrame(step); else { ui.animLam = null; $('btnAnim').textContent = '▶ Anima 0 → λc'; update(); } };
+    ui.animLam = requestAnimationFrame(step);
+  };
+  $('btnSweep').onclick = () => {
+    $('btnSweep').disabled = true; $('sweepNote').textContent = 'Calcolo in corso…';
+    setTimeout(() => {
+      const t0 = performance.now(); ui.sweep = runSweep(); ui.sweepKey = JSON.stringify(readParams()); $('charts').innerHTML = ''; drawCharts(null);
+      $('btnSweep').disabled = false;
+      $('sweepNote').textContent = ui.sweep.fail ? '' : `Modello: ${ui.sweep.model === 'hs' ? 'Heyman, linea più centrata (la linea al λc esiste solo in λc)' : $('p_model').selectedOptions[0].text} · ${ui.sweep.fr.length} valori di λ · ${fmt((performance.now() - t0) / 1000, 1)} s`;
+    }, 30);
+  };
+  $('btnVal').onclick = () => { $('valOut').innerHTML = '<p class="note">Calcolo…</p>'; setTimeout(validate, 20); };
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === b.dataset.tab));
+    if (b.dataset.tab === 't_chart') drawCharts(null);
+  });
+  let rt = null; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { drawArch(); drawVoussoirs(); if ($('t_chart').classList.contains('on')) drawCharts(null); }, 120); });
+  const mq = matchMedia('(prefers-color-scheme: dark)'), onTheme = () => { drawArch(); drawVoussoirs(); $('charts').innerHTML = ''; drawCharts(null); };
+  if (mq.addEventListener) mq.addEventListener('change', onTheme); else if (mq.addListener) mq.addListener(onTheme);
+}
+try { bind(); } catch (e) { console.error(e); }
+update();
+</script>
+</body>
+</html>
