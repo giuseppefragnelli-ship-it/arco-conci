@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trullo vs casa con solaio</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+  --grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--wash:rgba(11,11,11,.04);
+  --accent:#2a78d6;--s2:#eb6834;--alt:#a9a7a0;
+  --good:#0ca30c;--warn:#fab219;--crit:#d03b3b;
+  --stone:#ece7dc;--stone-sel:#d6cab0;--stone-edge:#a59d8c;--rc:#c9ccd1;--steel:#b0302f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--wash:rgba(255,255,255,.05);
+    --accent:#3987e5;--s2:#d95926;--alt:#6b6a65;
+    --stone:#2f2c27;--stone-sel:#4d4536;--stone-edge:#6e675a;--rc:#3a3d42;--steel:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;
+  --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--wash:rgba(255,255,255,.05);
+  --accent:#3987e5;--s2:#d95926;--alt:#6b6a65;
+  --stone:#2f2c27;--stone-sel:#4d4536;--stone-edge:#6e675a;--rc:#3a3d42;--steel:#e66767;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--accent)}
+header{padding:14px 20px 10px;display:flex;gap:6px 18px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+h1{font-size:18px;margin:0;font-weight:650;letter-spacing:-.01em}
+.sub{color:var(--ink2);font-size:13px}
+header nav{margin-left:auto;font-size:13px}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;padding:16px 20px 40px;max-width:1600px;margin:0 auto}
+@media (max-width:960px){.layout{grid-template-columns:1fr;padding:12px 16px 40px}header nav{margin-left:0}}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:0}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:0 0 8px;font-weight:650}
+.card h3{font-size:15px;margin:0 0 6px;font-weight:650}
+details.card>summary{cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);font-weight:650;list-style:none}
+details.card>summary::before{content:"▸ ";}
+details.card[open]>summary::before{content:"▾ ";}
+details.card[open]>summary{margin-bottom:8px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 84px;align-items:center;gap:8px;margin:5px 0}
+.row label{color:var(--ink2);font-size:13px}
+.unit{color:var(--muted);font-size:12px}
+input[type=number],select{width:100%;font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+.chk{display:flex;gap:6px;align-items:flex-start;font-size:13px;color:var(--ink2);margin:6px 0;cursor:pointer}
+.chk input{accent-color:var(--accent);margin:2px 0 0}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.4}
+.msg{padding:10px 12px;border-radius:8px;background:var(--wash);font-size:13px;margin:6px 0}
+.msg.warn{border-left:3px solid var(--warn)}
+.msg.crit{border-left:3px solid var(--crit)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:800px){.two{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:8px}
+.tile{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--bg)}
+.tile .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tile .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.tile.t{border-top:3px solid var(--accent)}
+.tile.h{border-top:3px solid var(--s2)}
+.verdict{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.vcard{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.vcard .k{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:650}
+.vcard .big{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums;margin:2px 0}
+.vcard .s{font-size:13px;color:var(--ink2)}
+.win-t{color:var(--accent)}.win-h{color:var(--s2)}.even{color:var(--ink2)}
+svg{display:block;width:100%;height:auto}
+svg text{font:11px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--ink2)}
+.big{font-size:22px !important}
+.gridl{stroke:var(--grid);stroke-width:1}
+.axisl{stroke:var(--axis);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink2);margin:4px 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{display:inline-block;width:18px;height:0;border-top:3px solid}
+.sw.d{border-top-style:dashed}
+.slider{display:grid;grid-template-columns:auto minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:13px;color:var(--ink2);margin:6px 0}
+.slider output{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.prose{max-width:860px}
+.prose h4{margin:14px 0 4px;font-size:14px}
+.prose p,.prose li{color:var(--ink);font-size:13.5px}
+.prose code{font-size:12.5px;background:var(--wash);padding:1px 4px;border-radius:4px}
+.ok{color:var(--good)}.bad{color:var(--crit)}
+.disc{font-size:12px;color:var(--ink2);border-left:3px solid var(--warn);padding:8px 12px;background:var(--wash);border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Trullo e casa con solaio · confronto strutturale</h1>
+  <span class="sub">Statica, durabilità e sisma con modelli analitici semplificati</span>
+  <nav><a href="index.html">Arco in conci →</a></nav>
+</header>
+
+<div class="layout">
+<aside>
+  <div class="card">
+    <h2>Trullo</h2>
+    <div class="row"><label for="t_Ri">Raggio interno <span class="unit">[m]</span></label><input type="number" id="t_Ri" value="2.5" min="1" max="5" step="0.1"></div>
+    <div class="row"><label for="t_s">Spessore muro <span class="unit">[m]</span></label><input type="number" id="t_s" value="1.6" min="0.5" max="3.5" step="0.1"></div>
+    <div class="row"><label for="t_hw">Altezza muro / imposta <span class="unit">[m]</span></label><input type="number" id="t_hw" value="2.2" min="1" max="4" step="0.1"></div>
+    <div class="row"><label for="t_hi">Chiave cupola interna <span class="unit">[m]</span></label><input type="number" id="t_hi" value="6.0" min="2" max="12" step="0.1"></div>
+    <div class="row"><label for="t_he">Vertice cono esterno <span class="unit">[m]</span></label><input type="number" id="t_he" value="7.5" min="2" max="14" step="0.1"></div>
+    <div class="row"><label for="t_p">Forma cupola <span class="unit">1 = cono</span></label><input type="number" id="t_p" value="1.6" min="1" max="3" step="0.1"></div>
+    <div class="row"><label for="t_th">Spessore candela portante <span class="unit">[m]</span></label><input type="number" id="t_th" value="0.9" min="0.2" max="2.5" step="0.05"></div>
+    <label class="chk"><input type="checkbox" id="t_fill"> Considera portante anche il riempimento (rinzeppa) tra candela e chiancarelle</label>
+    <div class="row"><label for="t_g">Peso specifico <span class="unit">[kN/m³]</span></label><input type="number" id="t_g" value="21" min="12" max="27" step="0.5"></div>
+    <div class="row"><label for="t_mu">Attrito pietra–pietra μ</label><input type="number" id="t_mu" value="0.65" min="0.3" max="1" step="0.05"></div>
+    <div class="row"><label for="t_fm">Resistenza a compressione <span class="unit">[MPa]</span></label><input type="number" id="t_fm" value="2.0" min="0.5" max="10" step="0.1"></div>
+    <p class="note">Muratura a secco in calcare: senza malta, nessuna resistenza a trazione, solo attrito sui giunti orizzontali.</p>
+  </div>
+
+  <div class="card">
+    <h2>Casa con solaio</h2>
+    <label class="chk"><input type="checkbox" id="c_eq" checked> Stessa superficie interna del trullo (pianta quadrata)</label>
+    <div class="row"><label for="c_L">Lato interno <span class="unit">[m]</span></label><input type="number" id="c_L" value="4.4" min="2" max="10" step="0.1"></div>
+    <div class="row"><label for="c_t">Spessore muri <span class="unit">[m]</span></label><input type="number" id="c_t" value="0.30" min="0.15" max="0.8" step="0.05"></div>
+    <div class="row"><label for="c_h">Altezza interpiano <span class="unit">[m]</span></label><input type="number" id="c_h" value="3.0" min="2.4" max="4.5" step="0.1"></div>
+    <div class="row"><label for="c_type">Muratura</label><select id="c_type"></select></div>
+    <div class="row"><label for="c_fm">f<sub>m</sub> compressione <span class="unit">[MPa]</span></label><input type="number" id="c_fm" step="0.1" min="0.5"></div>
+    <div class="row"><label for="c_tau">τ<sub>0</sub> taglio <span class="unit">[MPa]</span></label><input type="number" id="c_tau" step="0.005" min="0.005"></div>
+    <div class="row"><label for="c_g">Peso specifico <span class="unit">[kN/m³]</span></label><input type="number" id="c_g" step="0.5" min="10"></div>
+    <div class="row"><label for="c_op">Quota aperture <span class="unit">[0–0.6]</span></label><input type="number" id="c_op" value="0.25" min="0" max="0.6" step="0.05"></div>
+    <label class="chk"><input type="checkbox" id="c_cord" checked> Muri collegati al solaio (cordolo in c.a. / catene)</label>
+  </div>
+
+  <details class="card">
+    <summary>Solaio in laterocemento</summary>
+    <div class="row"><label for="c_hs">Altezza solaio <span class="unit">[cm]</span></label><input type="number" id="c_hs" value="24" min="16" max="40" step="1"></div>
+    <div class="row"><label for="c_G1">G<sub>1</sub> peso proprio <span class="unit">[kN/m²]</span></label><input type="number" id="c_G1" value="3.2" min="1" step="0.1"></div>
+    <div class="row"><label for="c_G2">G<sub>2</sub> permanenti portati <span class="unit">[kN/m²]</span></label><input type="number" id="c_G2" value="2.0" min="0" step="0.1"></div>
+    <div class="row"><label for="c_Q">Q variabile (copertura) <span class="unit">[kN/m²]</span></label><input type="number" id="c_Q" value="1.0" min="0" step="0.1"></div>
+    <div class="row"><label for="c_nb">Barre per travetto (interasse 50 cm)</label><input type="number" id="c_nb" value="2" min="1" max="4" step="1"></div>
+    <div class="row"><label for="c_phi">Diametro barre <span class="unit">[mm]</span></label><input type="number" id="c_phi" value="10" min="6" max="20" step="2"></div>
+    <div class="row"><label for="c_fyk">f<sub>yk</sub> acciaio <span class="unit">[MPa]</span></label><input type="number" id="c_fyk" value="450" min="200" step="10"></div>
+    <div class="row"><label for="c_cov">Copriferro <span class="unit">[mm]</span></label><input type="number" id="c_cov" value="20" min="5" max="60" step="1"></div>
+    <div class="row"><label for="c_k">Coeff. carbonatazione k <span class="unit">[mm/√anno]</span></label><input type="number" id="c_k" value="5" min="0.5" max="15" step="0.5"></div>
+    <div class="row"><label for="c_ic">Corrosione i<sub>corr</sub> <span class="unit">[µA/cm²]</span></label><input type="number" id="c_ic" value="0.5" min="0" max="5" step="0.1"></div>
+    <p class="note">k: 2–4 interno asciutto, 4–8 esterno riparato. i<sub>corr</sub>: &lt;0.1 trascurabile, 0.1–0.5 moderata, 0.5–1 elevata, &gt;1 molto elevata.</p>
+    <div class="row"><label for="d_rec">Erosione pietra calcarea <span class="unit">[mm/anno]</span></label><input type="number" id="d_rec" value="0.03" min="0" max="1" step="0.01"></div>
+  </details>
+
+  <details class="card">
+    <summary>Azione sismica (NTC 2018)</summary>
+    <div class="row"><label for="s_ag">a<sub>g</sub> di sito (SLV) <span class="unit">[g]</span></label><input type="number" id="s_ag" value="0.06" min="0.01" max="0.5" step="0.005"></div>
+    <div class="row"><label for="s_S">S amplificazione suolo</label><input type="number" id="s_S" value="1.0" min="1" max="2" step="0.05"></div>
+    <div class="row"><label for="s_F0">F<sub>0</sub> amplificazione spettrale</label><input type="number" id="s_F0" value="2.5" min="2" max="3" step="0.05"></div>
+    <div class="row"><label for="s_q">q fattore di comportamento</label><input type="number" id="s_q" value="2.0" min="1" max="3" step="0.1"></div>
+    <div class="row"><label for="s_FC">FC fattore di confidenza</label><input type="number" id="s_FC" value="1.35" min="1" max="1.5" step="0.05"></div>
+    <p class="note">a<sub>g</sub> = 0.06 g è un valore <b>indicativo</b> per la Murgia dei trulli: inserire quello del sito (NTC 2018, Allegato B). Suolo A (roccia calcarea) → S = 1.</p>
+  </details>
+</aside>
+
+<main>
+  <section class="card">
+    <h2>Esito del confronto</h2>
+    <div class="verdict" id="verdict"></div>
+    <div id="msgs"></div>
+  </section>
+
+  <section class="card">
+    <h2>Sezioni e linea delle pressioni</h2>
+    <div class="slider"><label for="v_a">Sisma α → destra</label><input type="range" id="v_a" min="0" max="1" step="0.005" value="0"><output id="o_a"></output></div>
+    <div class="legend">
+      <span><i class="sw" style="border-color:var(--accent)"></i>linea delle pressioni (spicchio)</span>
+      <span><i class="dot" style="display:inline-block;width:11px;height:11px;background:var(--stone-sel);border:1px solid var(--stone-edge)"></i>parte portante</span>
+      <span><i style="display:inline-block;width:11px;height:11px;background:var(--stone);border:1px solid var(--stone-edge)"></i>riempimento / chiancarelle</span>
+    </div>
+    <div class="two">
+      <div><div id="svgT"></div><div class="note" id="capT"></div></div>
+      <div><div id="svgH"></div><div class="note" id="capH"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>1 · Statica</h3>
+    <div class="stats" id="stStatic"></div>
+    <p class="note">Le due riserve non sono la stessa grandezza. Nel trullo, struttura a gravità senza armature, conta la <b>geometria</b>: il fattore geometrico dice quante volte lo spessore reale supera quello minimo che basterebbe a contenere la linea delle pressioni (Heyman). Nella casa l'anello debole è il <b>solaio</b>: il moltiplicatore dice di quanto si possono aumentare i carichi di esercizio prima del collasso a flessione.</p>
+  </section>
+
+  <section class="card">
+    <h3>2 · Durabilità: riserva residua nel tempo, senza manutenzione</h3>
+    <div class="legend">
+      <span><i class="sw" style="border-color:var(--accent)"></i>trullo: fattore geometrico (erosione della pietra)</span>
+      <span><i class="sw" style="border-color:var(--s2)"></i>solaio: capacità flessionale (carbonatazione → corrosione)</span>
+      <span><i class="sw d" style="border-color:var(--s2)"></i>soglia di collasso del solaio</span>
+    </div>
+    <div id="svgTime"></div>
+    <div class="stats" id="stDur"></div>
+  </section>
+
+  <section class="card">
+    <h3>3 · Sisma: accelerazione al suolo che attiva il collasso</h3>
+    <div id="svgSeis"></div>
+    <div class="stats" id="stSeis"></div>
+  </section>
+
+  <details class="card prose">
+    <summary>Metodo, ipotesi e limiti</summary>
+    <h4>Trullo: analisi limite per spicchi (teorema statico)</h4>
+    <p>Il trullo è un corpo di rotazione: muro cilindrico di raggio interno R<sub>i</sub> e spessore s, cupola interna a filari orizzontali aggettanti (candela) con profilo <code>r(z) = R<sub>i</sub>·(1 − ζ<sup>p</sup>)</code>, e cono esterno di chiancarelle. Lo si divide in spicchi (lune) di angolo unitario e in 260 filari orizzontali. Per ogni giunto orizzontale si calcola la posizione della risultante:</p>
+    <p><code>x(z) = [ Σ w·r̄ + Σ F·(z<sub>F</sub> − z) ± α·Σ w·(z̄ − z) ] / Σ w</code></p>
+    <p>dove w sono i pesi dei filari sovrastanti, F le spinte radiali verso l'esterno date dalla <b>compressione anulare</b> dei filari (l'effetto "anello" che tiene in piedi le false cupole) e α il coefficiente sismico statico equivalente. La compressione anulare non può essere di trazione (F ≥ 0) e si sceglie la minima necessaria. La struttura è in equilibrio sicuro se esiste una soluzione con la risultante dentro la parte portante in ogni giunto e con forza orizzontale ≤ μ·N (nessuno scorrimento a secco). Per il teorema statico dell'analisi limite questa è una stima a favore di sicurezza.</p>
+    <ul>
+      <li><b>Fattore di sicurezza geometrico</b>: si riduce lo spessore portante attorno alla linea media finché l'equilibrio non è più possibile; FSG = spessore reale / spessore minimo.</li>
+      <li><b>α<sub>c</sub> sismico</b>: massima forza orizzontale (in frazioni del peso) con equilibrio ammissibile, sia per lo spicchio spinto verso l'esterno sia per quello spinto verso l'interno. Comprende ribaltamento e scorrimento dei filari.</li>
+      <li>Il cono pieno sopra la chiave interna (pinnacolo) è trattato come blocco unico e conta solo come peso.</li>
+    </ul>
+    <h4>Casa: muratura portante con solaio in laterocemento</h4>
+    <ul>
+      <li><b>Solaio</b> in semplice appoggio, travetti a interasse 50 cm: <code>λ = A<sub>s</sub>·f<sub>yk</sub>·0.9d / [(G<sub>1</sub>+G<sub>2</sub>+Q)·0.5·L²/8]</code>.</li>
+      <li><b>Durabilità</b>: innesco della corrosione quando la carbonatazione raggiunge il copriferro, <code>t<sub>i</sub> = (c/k)²</code>. Poi la barra perde <code>P = 0.0116·i<sub>corr</sub>·(t − t<sub>i</sub>)</code> mm di raggio all'anno (modello di Tuutti) e A<sub>s</sub> si riduce con il quadrato del diametro. Il degrado del calcestruzzo per espulsione del copriferro, che accelera il processo, non è considerato.</li>
+      <li><b>Trullo nel tempo</b>: senza armature non c'è corrosione. Si considera solo l'erosione superficiale del calcare, che riduce il profilo esterno.</li>
+      <li><b>Sisma globale</b>: resistenza a taglio dei maschi murari (Turnšek–Čačovič), <code>V = A·1.5τ<sub>0</sub>·√(1 + σ<sub>0</sub>/1.5τ<sub>0</sub>)</code>, rapportata al peso totale.</li>
+      <li><b>Sisma fuori piano</b>: senza collegamenti, ribaltamento semplice della parete caricata dal solaio, <code>α<sub>0</sub> = (W·t/2 + N·2t/3)/(W·h/2 + N·h)</code>. Con cordolo o catene, flessione verticale con cerniera a metà altezza, <code>α<sub>0</sub> = 4(t/h)(1 + 2N/W)</code>.</li>
+    </ul>
+    <h4>Conversione in accelerazione al suolo</h4>
+    <p>Per entrambe le strutture si usa la stessa formula: <code>a<sub>g,cap</sub> = α·q / (S·F<sub>0</sub>·FC)</code>. È il plateau dello spettro, cautelativo per strutture rigide. Il confronto è quindi omogeneo e il rapporto tra le due capacità coincide con il rapporto tra i moltiplicatori α.</p>
+    <h4>Cosa il modello non include</h4>
+    <ul>
+      <li>Difetti locali reali: chiancarelle mancanti, infiltrazioni, lesioni, aperture ricavate nel muro del trullo, trulli accorpati con muri in comune.</li>
+      <li>Fondazioni, cedimenti del terreno, effetti dinamici e ciclici, componente verticale del sisma.</li>
+      <li>Una casa di nuova costruzione progettata secondo NTC 2018 è dimensionata proprio per l'azione sismica del sito, quindi supera la verifica per costruzione.</li>
+    </ul>
+    <p class="disc">Strumento divulgativo e di studio. I risultati dipendono dai parametri inseriti e non sostituiscono la valutazione della sicurezza di un edificio specifico redatta da un tecnico abilitato ai sensi delle NTC 2018.</p>
+  </details>
+</main>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fmt = (x, d = 2) => Number.isFinite(x) ? x.toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// Valori indicativi (medi) ispirati alla Circolare NTC 2019, Tab. C8.5.I
+const MASONRY = [
+  { id: 'tufo', name: 'Conci di pietra tenera (tufo)', fm: 1.9, tau: 0.035, g: 16 },
+  { id: 'pietr', name: 'Pietrame disordinato con malta', fm: 1.5, tau: 0.025, g: 19 },
+  { id: 'matt', name: 'Mattoni pieni e malta di calce', fm: 3.45, tau: 0.09, g: 18 },
+  { id: 'semip', name: 'Blocchi laterizi semipieni', fm: 6.5, tau: 0.125, g: 15 },
+];
+
+function initMasonry() {
+  const sel = $('c_type');
+  MASONRY.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.name; sel.appendChild(o); });
+  const apply = () => { const m = MASONRY.find(x => x.id === sel.value); $('c_fm').value = m.fm; $('c_tau').value = m.tau; $('c_g').value = m.g; };
+  sel.addEventListener('change', () => { apply(); update(); });
+  apply();
+}
+
+function readParams() {
+  const n = id => parseFloat($(id).value);
+  const T = { Ri: n('t_Ri'), s: n('t_s'), hw: n('t_hw'), hi: n('t_hi'), he: n('t_he'), p: n('t_p'), th: n('t_th'), fill: $('t_fill').checked, g: n('t_g'), mu: n('t_mu'), fm: n('t_fm') };
+  if ($('c_eq').checked) $('c_L').value = Math.sqrt(Math.PI * T.Ri * T.Ri).toFixed(2);
+  $('c_L').disabled = $('c_eq').checked;
+  const H = { L: n('c_L'), t: n('c_t'), h: n('c_h'), fm: n('c_fm'), tau: n('c_tau'), g: n('c_g'), op: n('c_op'), cord: $('c_cord').checked,
+    hs: n('c_hs') / 100, G1: n('c_G1'), G2: n('c_G2'), Q: n('c_Q'), nb: n('c_nb'), phi: n('c_phi'), fyk: n('c_fyk'), cov: n('c_cov'), k: n('c_k'), ic: n('c_ic') };
+  const S = { ag: n('s_ag'), S: n('s_S'), F0: n('s_F0'), q: n('s_q'), FC: n('s_FC') };
+  return { T, H, S, rec: n('d_rec') };
+}
+
+/* ---------------- TRULLO ---------------- */
+const NS = 260;
+function trulloGeom(T, rec = 0) {
+  const Re = T.Ri + T.s, dz = T.he / NS;
+  const rin = z => z < T.hw ? T.Ri : (z >= T.hi ? 0 : T.Ri * (1 - Math.pow((z - T.hw) / (T.hi - T.hw), T.p)));
+  const rout = z => Math.max(0, (z < T.hw ? Re : Re * (1 - (z - T.hw) / (T.he - T.hw))) - rec);
+  const band = z => { const lo = rin(z), ro = rout(z); const hi = (z < T.hw || T.fill) ? ro : Math.min(ro, lo + T.th); return [lo, hi]; };
+  const sl = [], jt = [];
+  let bad = false;
+  for (let k = 0; k < NS; k++) {
+    const z0 = k * dz, zm = z0 + dz / 2, ri = rin(zm), ro = rout(zm);
+    let w = 0, rb = 0;
+    if (ro > ri) { w = T.g * (ro * ro - ri * ri) / 2 * dz; rb = (2 / 3) * (ro ** 3 - ri ** 3) / (ro * ro - ri * ri); }
+    else if (zm < T.hi) bad = true;
+    sl.push({ z0, zm, w, rb });
+    const [lo, hi] = band(z0);
+    jt.push({ z: z0, lo, hi, check: z0 <= T.hi && hi > lo });
+  }
+  return { T, Re, dz, rin, rout, band, sl, jt, bad };
+}
+
+// Equilibrio di uno spicchio: dir=+1 inerzia verso l'esterno, -1 verso l'interno. s = frazione di spessore portante.
+function solveLune(G, s, alpha, dir, mu, tgt = 0) {
+  let V = 0, M = 0, S1 = 0, Fs = 0, FM = 0, ok = true, why = null, sigMax = 0, Fmax = 0;
+  const xs = new Array(NS).fill(null);
+  for (let k = NS - 1; k >= 0; k--) {
+    const sl = G.sl[k], j = G.jt[k];
+    V += sl.w; M += sl.w * sl.rb; S1 += sl.w * sl.zm;
+    if (V <= 1e-12) continue;
+    const z = j.z;
+    let num = M + (FM - Fs * z) + dir * alpha * (S1 - V * z);
+    if (!j.check) { xs[k] = num / V; continue; }
+    const c = (j.lo + j.hi) / 2, hh = (j.hi - j.lo) * s / 2, lo = c - hh, hi = c + hh;
+    const lt = lo + tgt * (hi - lo);
+    if (num / V < lt) { const a = sl.zm - z, dF = (lt * V - num) / a; Fs += dF; FM += dF * sl.zm; num = lt * V; }
+    const x = num / V;
+    xs[k] = x;
+    if (x > hi + 1e-9 && ok) { ok = false; why = { type: 'ecc', z }; }
+    const Hz = Fs + dir * alpha * V;
+    if (Math.abs(Hz) > mu * V + 1e-9 && ok) { ok = false; why = { type: 'slide', z }; }
+    const d = Math.min(x - lo, hi - x);
+    if (d > 0 && x > 0 && s === 1) sigMax = Math.max(sigMax, V / (x * 2 * d) / 1000); // MPa
+    Fmax = Math.max(Fmax, Fs);
+  }
+  return { ok, why, xs, sigMax, V, Fs: Fmax };
+}
+
+function bisect(f, lo, hi, it = 32) { for (let i = 0; i < it; i++) { const m = (lo + hi) / 2; if (f(m)) lo = m; else hi = m; } return lo; }
+
+function analyzeTrullo(T, rec = 0, full = true) {
+  const G = trulloGeom(T, rec);
+  const st = solveLune(G, 1, 0, 1, T.mu);
+  let gsf;
+  if (!st.ok) gsf = 0;
+  else if (solveLune(G, 0.02, 0, 1, T.mu).ok) gsf = 50;
+  else { const sMin = 1 - bisect(u => !solveLune(G, 1 - u, 0, 1, T.mu).ok ? false : true, 0, 0.98); gsf = 1 / sMin; }
+  if (!full) return { G, gsf };
+  const aOf = dir => solveLune(G, 1, 0, dir, T.mu).ok ? bisect(a => solveLune(G, 1, a, dir, T.mu).ok, 0, 1.5) : 0;
+  const aOut = aOf(1), aIn = aOf(-1);
+  let Wtot = 0; G.sl.forEach(s => Wtot += s.w); Wtot *= 2 * Math.PI;
+  const Abase = Math.PI * (G.Re ** 2 - T.Ri ** 2);
+  const lim = (dir, a) => solveLune(G, 1, a * 1.002 + 1e-4, dir, T.mu).why;
+  // tensioni: soluzione equilibrata con risultante lontana dai bordi (più compressione anulare, se ammissibile)
+  let sigMax = st.sigMax;
+  for (const tg of [0.3, 0.2, 0.1]) { const r = solveLune(G, 1, 0, 1, T.mu, tg); if (r.ok) { sigMax = r.sigMax; break; } }
+  return { G, st, gsf, aOut, aIn, alpha: Math.min(aOut, aIn), whyOut: lim(1, aOut), whyIn: lim(-1, aIn), Wtot, sigBase: Wtot / Abase / 1000, sigMax };
+}
+
+/* ---------------- CASA ---------------- */
+function analyzeHouse(H) {
+  const Ls = H.L + H.t;                          // luce tra gli assi dei muri
+  const As = H.nb * Math.PI * H.phi ** 2 / 4;      // mm² per travetto
+  const d = H.hs * 1000 - H.cov - H.phi / 2;       // mm
+  const MR = As * H.fyk * 0.9 * d / 1e6;           // kNm
+  const qk = H.G1 + H.G2 + H.Q, ME = qk * 0.5 * Ls * Ls / 8;
+  const lam0 = MR / ME;
+  const ti = (H.cov / H.k) ** 2;
+  const lamAt = t => { const P = t > ti ? 0.0116 * H.ic * (t - ti) : 0; const ph = Math.max(0, H.phi - 2 * P); return lam0 * (ph / H.phi) ** 2; };
+  let tFail = null; for (let t = 0; t <= 1000; t += 0.5) if (lamAt(t) < 1) { tFail = t; break; }
+  // pesi
+  const Wslab = (H.G1 + H.G2) * (H.L + 2 * H.t) ** 2;   // sisma: ψ2 = 0 in copertura
+  const Pc = 4 * Ls, Aw = Pc * H.t;                       // area muri in pianta [m²]
+  const Wwall = Aw * H.h * H.g * (1 - 0.6 * H.op);
+  const W = Wslab + Wwall;
+  const sig0 = (Wslab + 0.5 * Wwall) / (Aw * (1 - H.op)) / 1000; // MPa
+  const sigBase = W / (Aw * (1 - H.op)) / 1000;
+  const Adir = 2 * (H.L + 2 * H.t) * (1 - H.op) * H.t;
+  const VR = Adir * 1000 * 1.5 * H.tau * Math.sqrt(1 + sig0 / (1.5 * H.tau)); // kN
+  const aGlob = VR / W;
+  const N = (H.G1 + H.G2) * Ls / 2, Ww = H.t * H.h * H.g;   // per metro di parete portante
+  const aOver = (Ww * H.t / 2 + N * 2 * H.t / 3) / (Ww * H.h / 2 + N * H.h);
+  const aFlex = 4 * (H.t / H.h) * (1 + 2 * N / Ww);
+  const aOop = H.cord ? aFlex : aOver;
+  return { Ls, As, d, MR, ME, lam0, ti, lamAt, tFail, W, sig0, sigBase, lamCrush: H.fm / sigBase, VR, aGlob, aOver, aFlex, aOop, alpha: Math.min(aGlob, aOop), gov: aGlob <= aOop ? 'glob' : 'oop' };
+}
+
+/* ---------------- DISEGNI ---------------- */
+function svgTrullo(R, alpha) {
+  const G = R.G, T = G.T, W = 2 * G.Re + 2.6, Hh = T.he + 0.9;
+  const sc = 100, w = W * sc, h = Hh * sc, cx = w / 2, by = h - 0.45 * sc;
+  const X = r => cx + r * sc, Y = z => by - z * sc;
+  const zs = []; for (let i = 0; i <= 120; i++) zs.push(T.he * i / 120);
+  const outR = zs.map(z => [G.rout(z), z]).filter(p => p[0] > 0 || p[1] >= T.he - 1e-9);
+  const pathMirror = pts => { const right = pts.map(([r, z]) => `${X(r).toFixed(1)},${Y(z).toFixed(1)}`); const left = pts.slice().reverse().map(([r, z]) => `${X(-r).toFixed(1)},${Y(z).toFixed(1)}`); return 'M' + right.join('L') + 'L' + left.join('L') + 'Z'; };
+  const inner = []; for (let i = 0; i <= 100; i++) { const z = T.hi * i / 100; inner.push([G.rin(z), z]); }
+  // banda portante (destra e sinistra)
+  const band = side => { const up = [], dn = []; for (let i = 0; i <= 120; i++) { const z = T.hi * i / 120; const [lo, hi] = G.band(z); up.push(`${X(side * lo).toFixed(1)},${Y(z).toFixed(1)}`); dn.push(`${X(side * hi).toFixed(1)},${Y(z).toFixed(1)}`); } return 'M' + up.join('L') + 'L' + dn.reverse().join('L') + 'Z'; };
+  const line = (xs, side) => { const pts = []; for (let k = 0; k < NS; k++) if (xs[k] !== null && G.jt[k].check) pts.push(`${X(side * xs[k]).toFixed(1)},${Y(G.jt[k].z).toFixed(1)}`); return pts.length ? 'M' + pts.join('L') : ''; };
+  const sR = solveLune(G, 1, alpha, 1, T.mu), sL = solveLune(G, 1, alpha, -1, T.mu);
+  const col = ok => ok ? 'var(--accent)' : 'var(--crit)';
+  let arrow = '';
+  if (alpha > 0) { const ay = Y(T.he * 0.55), ax = X(G.Re + 0.25); arrow = `<line x1="${ax}" y1="${ay}" x2="${ax + 40}" y2="${ay}" stroke="var(--s2)" stroke-width="2.5"/><path d="M${ax + 46},${ay} l-9,-5 v10z" fill="var(--s2)"/><text x="${ax - 4}" y="${ay - 10}" class="big">α = ${fmt(alpha, 2)}</text>`; }
+  return { ok: sR.ok && sL.ok, html: `<svg viewBox="0 0 ${w.toFixed(0)} ${h.toFixed(0)}" role="img" aria-label="Sezione del trullo">
+    <line x1="0" y1="${by}" x2="${w}" y2="${by}" class="axisl"/>
+    <path d="${pathMirror(outR)} ${pathMirror(inner)}" fill-rule="evenodd" style="fill:var(--stone);stroke:var(--stone-edge)"/>
+    <path d="${band(1)}" style="fill:var(--stone-sel);stroke:none"/><path d="${band(-1)}" style="fill:var(--stone-sel);stroke:none"/>
+    <line x1="${cx}" y1="${Y(T.he + 0.3)}" x2="${cx}" y2="${by + 6}" stroke="var(--axis)" stroke-dasharray="4 4"/>
+    <path d="${line(sR.xs, 1)}" fill="none" stroke="${col(sR.ok)}" stroke-width="2.2"/>
+    <path d="${line(sL.xs, -1)}" fill="none" stroke="${col(sL.ok)}" stroke-width="2.2"/>
+    ${arrow}
+    <text x="${X(-G.Re)}" y="${by + 30}" class="big">⌀ esterno ${fmt(2 * G.Re, 1)} m</text>
+    <text x="${X(0.1)}" y="${Y(T.he) - 8}" class="big">h ${fmt(T.he, 1)} m</text>
+  </svg>` };
+}
+
+function svgHouse(H, R, Tscale) {
+  const W = Math.max(H.L + 2 * H.t + 1.2, Tscale.w), Hh = Tscale.h;
+  const sc = 100, w = W * sc, h = Hh * sc, cx = w / 2, by = h - 0.45 * sc;
+  const X = r => cx + r * sc, Y = z => by - z * sc;
+  const half = H.L / 2;
+  const wall = side => { const x0 = side > 0 ? half : -half - H.t; return `<rect x="${X(x0)}" y="${Y(H.h)}" width="${H.t * sc}" height="${H.h * sc}" style="fill:var(--stone-sel);stroke:var(--stone-edge)"/>`; };
+  const slab = `<rect x="${X(-half - H.t)}" y="${Y(H.h + H.hs)}" width="${(H.L + 2 * H.t) * sc}" height="${H.hs * sc}" style="fill:var(--rc);stroke:var(--stone-edge)"/>`;
+  const bar = `<line x1="${X(-half)}" y1="${Y(H.h + (H.cov + H.phi / 2) / 1000)}" x2="${X(half)}" y2="${Y(H.h + (H.cov + H.phi / 2) / 1000)}" stroke="var(--steel)" stroke-width="2"/>`;
+  const cord = H.cord ? `<rect x="${X(-half - H.t)}" y="${Y(H.h)}" width="${(H.t) * sc}" height="${0.2 * sc}" style="fill:var(--rc)"/><rect x="${X(half)}" y="${Y(H.h)}" width="${H.t * sc}" height="${0.2 * sc}" style="fill:var(--rc)"/>` : '';
+  return `<svg viewBox="0 0 ${w.toFixed(0)} ${h.toFixed(0)}" role="img" aria-label="Sezione della casa">
+    <line x1="0" y1="${by}" x2="${w}" y2="${by}" class="axisl"/>${wall(1)}${wall(-1)}${cord}${slab}${bar}
+    <text x="${X(-half - H.t)}" y="${by + 30}" class="big">luce ${fmt(R.Ls, 2)} m · muri ${fmt(H.t * 100, 0)} cm</text>
+    <text x="${X(-half - H.t)}" y="${Y(H.h + H.hs) - 12}" class="big">solaio ${fmt(H.hs * 100, 0)} cm · ${H.nb}⌀${H.phi}/travetto · copriferro ${H.cov} mm</text>
+  </svg>`;
+}
+
+function svgTime(TT, HR, rec, T) {
+  const w = 760, h = 260, m = { l: 46, r: 16, t: 12, b: 34 }, tmax = 200;
+  const X = t => m.l + (w - m.l - m.r) * t / tmax, Yv = v => m.t + (h - m.t - m.b) * (1 - v / 120);
+  let g = '';
+  for (let v = 0; v <= 120; v += 20) g += `<line x1="${m.l}" x2="${w - m.r}" y1="${Yv(v)}" y2="${Yv(v)}" class="gridl"/><text x="${m.l - 6}" y="${Yv(v) + 4}" text-anchor="end">${v}%</text>`;
+  for (let t = 0; t <= tmax; t += 25) g += `<text x="${X(t)}" y="${h - m.b + 16}" text-anchor="middle">${t}</text>`;
+  g += `<text x="${(w + m.l) / 2}" y="${h - 4}" text-anchor="middle">anni</text>`;
+  // trullo
+  const tp = [];
+  for (let t = 0; t <= tmax; t += 25) { const r = analyzeTrullo(T, rec * t / 1000, false); tp.push([t, TT.gsf > 0 ? Math.min(100, 100 * r.gsf / TT.gsf) : 0]); /* l'erosione non può aumentare la sicurezza: limitato a 100% */ }
+  const hp = []; for (let t = 0; t <= tmax; t += 2) hp.push([t, Math.min(120, 100 * HR.lamAt(t) / HR.lam0)]);
+  const pl = (pts, c) => `<path d="M${pts.map(([t, v]) => `${X(t).toFixed(1)},${Yv(v).toFixed(1)}`).join('L')}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  const thr = 100 / HR.lam0;
+  let extra = '';
+  if (thr <= 120) extra += `<line x1="${m.l}" x2="${w - m.r}" y1="${Yv(thr)}" y2="${Yv(thr)}" stroke="var(--s2)" stroke-dasharray="5 4"/><text x="${w - m.r - 4}" y="${Yv(thr) - 5}" text-anchor="end" style="fill:var(--s2)">collasso solaio</text>`;
+  if (HR.ti < tmax) extra += `<line x1="${X(HR.ti)}" x2="${X(HR.ti)}" y1="${m.t}" y2="${h - m.b}" class="axisl" stroke-dasharray="3 3"/><text x="${X(HR.ti) + 4}" y="${m.t + 12}">innesco corrosione · ${fmt(HR.ti, 0)} anni</text>`;
+  if (HR.tFail !== null && HR.tFail <= tmax) extra += `<circle cx="${X(HR.tFail)}" cy="${Yv(thr)}" r="4.5" fill="var(--s2)"/>`;
+  return { html: `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Riserva residua nel tempo">${g}<line x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${h - m.b}" class="axisl"/>${extra}${pl(tp, 'var(--accent)')}${pl(hp, 'var(--s2)')}</svg>`, t200: tp[tp.length - 1][1] };
+}
+
+function svgSeis(rows, ag) {
+  const w = 760, rh = 30, m = { l: 250, r: 70, t: 26, b: 38 }, h = m.t + rows.length * rh + m.b;
+  const vmax = Math.max(ag * 1.3, ...rows.map(r => r.v)) * 1.1;
+  const X = v => m.l + (w - m.l - m.r) * v / vmax;
+  let s = '';
+  const step = vmax > 1 ? 0.2 : vmax > 0.4 ? 0.1 : 0.05;
+  for (let v = 0; v <= vmax + 1e-9; v += step) s += `<line x1="${X(v)}" x2="${X(v)}" y1="${m.t}" y2="${h - m.b}" class="gridl"/><text x="${X(v)}" y="${h - m.b + 14}" text-anchor="middle">${fmt(v, 2)}</text>`;
+  s += `<text x="${(w + m.l) / 2}" y="${h - 2}" text-anchor="middle">a<tspan baseline-shift="sub" font-size="8">g</tspan> che attiva il collasso [g]</text>`;
+  rows.forEach((r, i) => {
+    const y = m.t + i * rh + 6;
+    s += `<text x="${m.l - 8}" y="${y + 13}" text-anchor="end" style="fill:var(--ink${r.main ? '' : '2'});${r.main ? 'font-weight:600' : ''}">${r.label}</text>`;
+    s += `<rect x="${m.l}" y="${y}" width="${Math.max(1, X(r.v) - m.l)}" height="${rh - 12}" rx="3" fill="${r.c}" opacity="${r.main ? 1 : 0.45}"/>`;
+    s += `<text x="${X(r.v) + 5}" y="${y + 13}">${fmt(r.v, 3)}</text>`;
+  });
+  s += `<line x1="${X(ag)}" x2="${X(ag)}" y1="${m.t - 6}" y2="${h - m.b}" stroke="var(--crit)" stroke-width="2" stroke-dasharray="5 3"/><text x="${X(ag) + 4}" y="${m.t - 10}" style="fill:var(--crit)">domanda a<tspan baseline-shift="sub" font-size="8">g</tspan> = ${fmt(ag, 3)} g</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Capacità sismica">${s}</svg>`;
+}
+
+/* ---------------- UI ---------------- */
+const tile = (cls, k, v, s) => `<div class="tile ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+const whyTxt = w => !w ? '' : (w.type === 'slide' ? `scorrimento di un filare a z ≈ ${fmt(w.z, 2)} m` : `risultante esce dalla sezione portante a z ≈ ${fmt(w.z, 2)} m`);
+
+let last = null;
+function update() {
+  const P = readParams(), T = P.T, H = P.H, S = P.S;
+  const msgs = [];
+  if (!(T.hi > T.hw + 0.3) || !(T.he > T.hi)) { $('msgs').innerHTML = '<div class="msg crit">Geometria non valida: serve imposta &lt; chiave interna &lt; vertice esterno.</div>'; return; }
+  const TR = analyzeTrullo(T, 0, true);
+  if (TR.G.bad) msgs.push('<div class="msg crit">La cupola interna esce dal cono esterno: aumentare il vertice esterno o lo spessore del muro.</div>');
+  const HR = analyzeHouse(H);
+  last = { P, TR, HR };
+
+  // sezioni
+  const amax = Math.max(TR.alpha, 0.05);
+  $('v_a').max = (Math.ceil(amax * 1.3 * 100) / 100).toFixed(2);
+  const a = parseFloat($('v_a').value); $('o_a').textContent = fmt(a, 3) + ' g';
+  const st = svgTrullo(TR, a);
+  $('svgT').innerHTML = st.html;
+  const tW = 2 * TR.G.Re + 2.6, tH = T.he + 0.9;
+  $('svgH').innerHTML = svgHouse(H, HR, { w: tW, h: tH });
+  $('capT').innerHTML = a === 0 ? `Trullo: linea delle pressioni sotto il peso proprio. A destra lo spicchio è spinto verso l'esterno, a sinistra verso l'interno.` :
+    (st.ok ? `Con α = ${fmt(a, 3)} esiste ancora un equilibrio ammissibile (α<sub>c</sub> = ${fmt(TR.alpha, 3)}).` : `<span class="bad">Con α = ${fmt(a, 3)} non c'è equilibrio ammissibile</span>: oltre α<sub>c</sub> = ${fmt(TR.alpha, 3)} si forma un meccanismo.`);
+  $('capH').innerHTML = `Casa a pari scala: solaio in laterocemento su muri in ${$('c_type').selectedOptions[0].text.toLowerCase()}${H.cord ? ' con cordolo' : ', senza cordolo'}. In rosso l'armatura dei travetti.`;
+
+  // statica
+  $('stStatic').innerHTML = [
+    tile('t', 'Trullo · fattore geometrico', TR.gsf >= 50 ? '> 50×' : TR.gsf > 0 ? fmt(TR.gsf, 2) + '×' : '<span class="bad">&lt; 1</span>', 'spessore reale / spessore minimo'),
+    tile('t', 'Trullo · compressione', fmt(TR.sigBase, 3) + ' MPa', `media alla base · max nei giunti ${fmt(TR.sigMax, 2)} MPa (${fmt(T.fm / Math.max(TR.sigMax, 1e-6), 1)}× sotto f<sub>m</sub>)`),
+    tile('t', 'Trullo · peso totale', fmt(TR.Wtot / 9.81, 0) + ' t', `${fmt(TR.Wtot, 0)} kN su ${fmt(Math.PI * T.Ri ** 2, 1)} m² interni`),
+    tile('h', 'Solaio · moltiplicatore di collasso', fmt(HR.lam0, 2) + '×', `M<sub>R</sub> ${fmt(HR.MR, 1)} kNm / M<sub>E</sub> ${fmt(HR.ME, 1)} kNm per travetto`),
+    tile('h', 'Casa · compressione muri', fmt(HR.sigBase, 3) + ' MPa', `${fmt(HR.lamCrush, 1)}× sotto f<sub>m</sub>`),
+    tile('h', 'Casa · peso totale', fmt(HR.W / 9.81, 0) + ' t', `${fmt(HR.W, 0)} kN su ${fmt(H.L * H.L, 1)} m² interni`),
+  ].join('');
+
+  // durabilità
+  const tm = svgTime(TR, HR, P.rec, T);
+  $('svgTime').innerHTML = tm.html;
+  $('stDur').innerHTML = [
+    tile('h', 'Solaio · innesco corrosione', fmt(HR.ti, 0) + ' anni', `carbonatazione a ${H.cov} mm con k = ${fmt(H.k, 1)}`),
+    tile('h', 'Solaio · collasso senza manutenzione', HR.tFail === null ? '> 1000 anni' : fmt(HR.tFail, 0) + ' anni', `riserva a 100 anni: ${fmt(100 * HR.lamAt(100) / HR.lam0, 0)}%`),
+    tile('t', 'Trullo · riserva a 200 anni', fmt(tm.t200, 0) + '%', `erosione ${fmt(P.rec * 200, 0)} mm del profilo esterno`),
+  ].join('');
+
+  // sisma
+  const conv = al => al * S.q / (S.S * S.F0 * S.FC);
+  const agT = conv(TR.alpha), agH = conv(HR.alpha);
+  const rows = [
+    { label: 'Trullo', v: agT, c: 'var(--accent)', main: true },
+    { label: 'spicchio spinto all\'esterno', v: conv(TR.aOut), c: 'var(--accent)' },
+    { label: 'spicchio spinto all\'interno', v: conv(TR.aIn), c: 'var(--accent)' },
+    { label: 'Casa con solaio', v: agH, c: 'var(--s2)', main: true },
+    { label: 'taglio globale dei muri', v: conv(HR.aGlob), c: 'var(--s2)' },
+    { label: H.cord ? 'flessione verticale fuori piano' : 'ribaltamento fuori piano', v: conv(HR.aOop), c: 'var(--s2)' },
+  ];
+  $('svgSeis').innerHTML = svgSeis(rows, S.ag);
+  $('stSeis').innerHTML = [
+    tile('t', 'Trullo · α<sub>c</sub>', fmt(TR.alpha, 3), `${TR.aOut <= TR.aIn ? 'spicchio esterno: ' + whyTxt(TR.whyOut) : 'spicchio interno: ' + whyTxt(TR.whyIn)}`),
+    tile('t', 'Trullo · capacità / domanda', fmt(agT / S.ag, 2) + '×', `a<sub>g,cap</sub> = ${fmt(agT, 3)} g`),
+    tile('h', 'Casa · α<sub>c</sub>', fmt(HR.alpha, 3), HR.gov === 'glob' ? 'governa il taglio globale dei muri' : (H.cord ? 'governa la flessione fuori piano' : 'governa il ribaltamento fuori piano (muri non collegati)')),
+    tile('h', 'Casa · capacità / domanda', fmt(agH / S.ag, 2) + '×', `a<sub>g,cap</sub> = ${fmt(agH, 3)} g`),
+  ].join('');
+
+  // verdetto
+  const cmp = (a, b, unit, lab) => { const r = a / b; const cls = r > 1.1 ? 'win-t' : r < 0.9 ? 'win-h' : 'even'; const txt = r > 1.1 ? 'favorevole al trullo' : r < 0.9 ? 'favorevole alla casa' : 'equivalenti'; return { cls, txt, r }; };
+  const sCmp = cmp(TR.gsf, HR.lam0), sisCmp = cmp(agT, agH);
+  const durT = tm.t200, durH = 100 * HR.lamAt(200) / HR.lam0, dCmp = cmp(durT, Math.max(durH, 1e-3));
+  $('verdict').innerHTML = [
+    `<div class="vcard"><div class="k">Statica</div><div class="big ${sCmp.cls}">${sCmp.txt}</div><div class="s">Fattore geometrico del trullo ${TR.gsf >= 50 ? '> 50' : fmt(TR.gsf, 2)}× contro moltiplicatore di collasso del solaio ${fmt(HR.lam0, 2)}×. Grandezze di natura diversa: vedi nota sotto.</div></div>`,
+    `<div class="vcard"><div class="k">Durabilità (200 anni, senza manutenzione)</div><div class="big ${dCmp.cls}">${dCmp.txt}</div><div class="s">Riserva residua: trullo ${fmt(durT, 0)}%, solaio ${fmt(durH, 0)}%${HR.tFail !== null && HR.tFail <= 200 ? ` (collasso teorico a ${fmt(HR.tFail, 0)} anni)` : ''}.</div></div>`,
+    `<div class="vcard"><div class="k">Sisma</div><div class="big ${sisCmp.cls}">${sisCmp.txt}${sisCmp.r > 1.1 || sisCmp.r < 0.9 ? ` · ${fmt(sisCmp.r >= 1 ? sisCmp.r : 1 / sisCmp.r, 1)}×` : ''}</div><div class="s">a<sub>g</sub> di collasso: trullo ${fmt(agT, 3)} g, casa ${fmt(agH, 3)} g. Domanda di sito ${fmt(S.ag, 3)} g.</div></div>`,
+  ].join('');
+  if (TR.gsf > 0 && TR.gsf < 1.2) msgs.push('<div class="msg warn">Il fattore geometrico del trullo è vicino a 1: la candela è troppo sottile per la forma scelta.</div>');
+  if (!TR.st.ok) msgs.push(`<div class="msg crit">Il trullo non trova un equilibrio ammissibile neanche sotto il peso proprio (${whyTxt(TR.st.why)}). Rivedere geometria o spessori.</div>`);
+  $('msgs').innerHTML = msgs.join('');
+}
+
+function bind() {
+  initMasonry();
+  document.querySelectorAll('aside input, aside select').forEach(el => { if (el.id !== 'c_type') el.addEventListener('input', () => { clearTimeout(bind.t); bind.t = setTimeout(update, 60); }); });
+  $('v_a').addEventListener('input', update);
+}
+bind();
+update();
+</script>
+</body>
+</html>
