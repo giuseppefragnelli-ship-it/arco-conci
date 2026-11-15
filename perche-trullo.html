@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perché un trullo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f6f2ea;--card:#fffdf8;--ink:#2a2622;--ink2:#5e574e;--muted:#8f877b;--line:#e4dccd;
+  --trullo:#3d6f8e;--trullo-soft:#dce8ef;--house:#c0623b;--house-soft:#f5e1d6;
+  --good:#3f8f4f;--warn:#d69a1c;--bad:#c03a2b;
+  --lime:#fbfaf6;--cone:#8e8a82;--cone2:#7a766f;--tufo:#dcc79c;--tufo2:#c9b27f;--cls:#b8b5ae;--rust:#b35a1f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:650;letter-spacing:-.01em;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.hero{padding:56px 0 28px;text-align:center}
+.hero .kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--trullo);font-weight:600}
+.hero h1{font-size:clamp(32px,6vw,52px);margin:8px 0 12px}
+.hero p{max-width:640px;margin:0 auto;color:var(--ink2);font-size:17px}
+.pick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:22px 0 4px}
+.pick button{font:inherit;font-size:14px;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer}
+.pick button.on{background:var(--house);border-color:var(--house);color:#fff;font-weight:600}
+.picknote{text-align:center;font-size:13px;color:var(--muted);margin:6px auto 0;max-width:600px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 24px;margin:22px 0}
+@media (max-width:600px){.step{padding:20px 14px}}
+.stephead{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.num{flex:none;width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:Fraunces,serif;font-weight:650}
+.stephead h2{font-size:26px}
+.stephead p{margin:4px 0 0;color:var(--ink2)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bld{border-radius:14px;padding:12px 12px 14px;text-align:center}
+.bld.t{background:var(--trullo-soft)}.bld.h{background:var(--house-soft)}
+.bld h3{font-size:18px}
+.bld .sub{font-size:13px;color:var(--ink2);min-height:2.6em}
+.bld svg{width:100%;max-width:340px;height:auto;display:block;margin:4px auto 0;overflow:visible}
+.meter{height:12px;border-radius:6px;background:rgba(0,0,0,.08);overflow:hidden;margin:8px 0 4px}
+.meter i{display:block;height:100%;border-radius:6px;transition:width .25s,background .25s}
+.state{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.state small{font-weight:400;color:var(--ink2)}
+.ctrl{margin:20px 0 4px}
+.ctrl .lab{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ctrl .big{font-family:Fraunces,serif;font-size:30px;font-weight:650;font-variant-numeric:tabular-nums}
+.ctrl .ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+input[type=range]{width:100%;accent-color:var(--ink);height:28px;margin:6px 0 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
+.fact{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg)}
+.fact .k{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.fact .v{font-family:Fraunces,serif;font-size:24px;font-weight:650;margin:2px 0;font-variant-numeric:tabular-nums}
+.fact .s{font-size:14px;color:var(--ink2)}
+.fact.t .v{color:var(--trullo)}.fact.h .v{color:var(--house)}
+.shakebtn{font:inherit;font-weight:600;font-size:16px;padding:12px 22px;border-radius:12px;border:0;background:var(--ink);color:#fff;cursor:pointer;margin-top:10px}
+.shakebtn:disabled{opacity:.5;cursor:default}
+.outcome{min-height:1.5em;font-weight:600;margin-top:6px;font-size:15px}
+.ok{color:var(--good)}.ko{color:var(--bad)}.mid{color:var(--warn)}
+@keyframes shake{0%,100%{transform:translateX(0)}10%{transform:translateX(calc(var(--amp)*-1))}20%{transform:translateX(var(--amp))}30%{transform:translateX(calc(var(--amp)*-.9))}40%{transform:translateX(calc(var(--amp)*.9))}50%{transform:translateX(calc(var(--amp)*-.8))}60%{transform:translateX(calc(var(--amp)*.7))}70%{transform:translateX(calc(var(--amp)*-.5))}80%{transform:translateX(calc(var(--amp)*.35))}90%{transform:translateX(calc(var(--amp)*-.15))}}
+.shaking{animation:shake 1.6s ease-out}
+.fx{transition:opacity .4s, transform .6s}
+.flow{stroke-dasharray:7 9;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-32}}
+@media (prefers-reduced-motion:reduce){.flow,.shaking{animation:none}}
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:center}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+.split svg{width:100%;height:auto;max-width:440px;display:block;margin:0 auto}
+.bullets{list-style:none;padding:0;margin:0}
+.bullets li{padding:10px 0 10px 32px;position:relative;border-bottom:1px solid var(--line)}
+.bullets li:last-child{border:0}
+.bullets li::before{content:"";position:absolute;left:4px;top:16px;width:14px;height:14px;border-radius:50%;background:var(--trullo)}
+.summary{background:var(--ink);color:#f6f2ea;border-radius:18px;padding:28px 24px;margin:22px 0}
+.summary h2{font-size:28px;margin-bottom:12px}
+.srow{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,.14)}
+@media (max-width:600px){.srow{grid-template-columns:1fr;gap:2px}}
+.srow b{font-family:Fraunces,serif;font-size:18px}
+.srow span{color:#d9d2c5}
+.srow .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:1px}
+.tag.w{background:#cfe3ee;color:#1d3f55}.tag.p{background:#e9e3d7;color:#4a443b}.tag.l{background:#f3d3c3;color:#6d2c12}
+.cta{display:inline-block;margin-top:18px;background:#f6f2ea;color:var(--ink);text-decoration:none;font-weight:600;padding:12px 22px;border-radius:12px}
+.foot{font-size:13px;color:var(--muted);padding:6px 0 48px;max-width:780px}
+.foot a{color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="kicker">Il tuo investimento in pietra</div>
+    <h1>Perché un trullo?</h1>
+    <p>Mettiamo un trullo accanto a una casa pugliese con solaio in cemento armato e li sottoponiamo a tre prove: il tempo, il terremoto e il peso. I numeri vengono da calcoli strutturali, non da slogan.</p>
+    <div class="pick" id="pick">
+      <button data-s="trad" class="on">Casa in tufo anni '60–'80</button>
+      <button data-s="cord">Casa in tufo con cordolo</button>
+      <button data-s="mod">Casa nuova antisismica</button>
+    </div>
+    <p class="picknote" id="picknote"></p>
+  </section>
+
+  <!-- 1 TEMPO -->
+  <section class="step">
+    <div class="stephead"><div class="num">1</div><div><h2>La macchina del tempo</h2><p>Sposta il cursore e guarda cosa succede in 200 anni senza manutenzione strutturale.</p></div></div>
+    <div class="duo">
+      <div class="bld t"><h3>Trullo</h3><div class="sub">Pietra calcarea a secco, nessun ferro</div><div id="tT"></div>
+        <div class="meter"><i id="mT"></i></div><div class="state" id="sT"></div></div>
+      <div class="bld h"><h3>Casa con solaio</h3><div class="sub" id="hSub"></div><div id="tH"></div>
+        <div class="meter"><i id="mH"></i></div><div class="state" id="sH"></div></div>
+    </div>
+    <div class="ctrl">
+      <div class="lab"><span>Età dell'edificio</span><span class="big" id="yrs">0 anni</span></div>
+      <input type="range" id="yr" min="0" max="200" step="1" value="0" aria-label="Età in anni">
+      <div class="ticks"><span>oggi</span><span>50</span><span>100</span><span>150</span><span>200 anni</span></div>
+    </div>
+    <div class="facts" id="factsTime"></div>
+  </section>
+
+  <!-- 2 SISMA -->
+  <section class="step">
+    <div class="stephead"><div class="num">2</div><div><h2>Il terremoto</h2><p>Scegli quanto forte è la scossa e premi “Scuoti”.</p></div></div>
+    <div class="duo">
+      <div class="bld t"><h3>Trullo</h3><div id="eT"></div><div class="outcome" id="oT">&nbsp;</div></div>
+      <div class="bld h"><h3>Casa con solaio</h3><div id="eH"></div><div class="outcome" id="oH">&nbsp;</div></div>
+    </div>
+    <div class="ctrl">
+      <div class="lab"><span>Forza della scossa</span><span class="big" id="eqv"></span></div>
+      <input type="range" id="eq" min="0.02" max="0.8" step="0.01" value="0.06" aria-label="Accelerazione al suolo">
+      <div class="ticks"><span>lieve</span><span>moderata</span><span>forte</span><span>molto forte</span><span>estrema</span></div>
+      <button class="shakebtn" id="shake">Scuoti</button>
+    </div>
+    <div class="facts" id="factsEq"></div>
+  </section>
+
+  <!-- 3 STATICA -->
+  <section class="step">
+    <div class="stephead"><div class="num">3</div><div><h2>Il segreto della cupola</h2><p>Perché le pietre stanno su da sole, senza malta e senza ferro.</p></div></div>
+    <div class="split">
+      <div id="sec"></div>
+      <ul class="bullets" id="bullets"></ul>
+    </div>
+  </section>
+
+  <!-- RIEPILOGO -->
+  <section class="summary">
+    <h2>In sintesi</h2>
+    <div id="sum"></div>
+    <a class="cta" href="#preventivo">Richiedi un preventivo</a>
+  </section>
+
+  <p class="foot">Valori calcolati con modelli strutturali semplificati (analisi limite delle murature, durabilità del calcestruzzo armato, azione sismica secondo NTC 2018) per un trullo tipo e una casa tipo della stessa superficie interna. Sono indicativi e dipendono da come è costruito il singolo edificio. Non sostituiscono la valutazione strutturale di un tecnico abilitato. <a href="trullo.html">Vedi i calcoli dettagliati →</a></p>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fmt = (x, d = 0) => Number.isFinite(x) ? x.toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
+
+const NS = 260;
+function trulloGeom(T, rec = 0) {
+  const Re = T.Ri + T.s, dz = T.he / NS;
+  const rin = z => z < T.hw ? T.Ri : (z >= T.hi ? 0 : T.Ri * (1 - Math.pow((z - T.hw) / (T.hi - T.hw), T.p)));
+  const rout = z => Math.max(0, (z < T.hw ? Re : Re * (1 - (z - T.hw) / (T.he - T.hw))) - rec);
+  const band = z => { const lo = rin(z), ro = rout(z); const hi = (z < T.hw || T.fill) ? ro : Math.min(ro, lo + T.th); return [lo, hi]; };
+  const sl = [], jt = [];
+  let bad = false;
+  for (let k = 0; k < NS; k++) {
+    const z0 = k * dz, zm = z0 + dz / 2, ri = rin(zm), ro = rout(zm);
+    let w = 0, rb = 0;
+    if (ro > ri) { w = T.g * (ro * ro - ri * ri) / 2 * dz; rb = (2 / 3) * (ro ** 3 - ri ** 3) / (ro * ro - ri * ri); }
+    else if (zm < T.hi) bad = true;
+    sl.push({ z0, zm, w, rb });
+    const [lo, hi] = band(z0);
+    jt.push({ z: z0, lo, hi, check: z0 <= T.hi && hi > lo });
+  }
+  return { T, Re, dz, rin, rout, band, sl, jt, bad };
+}
+
+// Equilibrio di uno spicchio: dir=+1 inerzia verso l'esterno, -1 verso l'interno. s = frazione di spessore portante.
+function solveLune(G, s, alpha, dir, mu, tgt = 0) {
+  let V = 0, M = 0, S1 = 0, Fs = 0, FM = 0, ok = true, why = null, sigMax = 0, Fmax = 0;
+  const xs = new Array(NS).fill(null);
+  for (let k = NS - 1; k >= 0; k--) {
+    const sl = G.sl[k], j = G.jt[k];
+    V += sl.w; M += sl.w * sl.rb; S1 += sl.w * sl.zm;
+    if (V <= 1e-12) continue;
+    const z = j.z;
+    let num = M + (FM - Fs * z) + dir * alpha * (S1 - V * z);
+    if (!j.check) { xs[k] = num / V; continue; }
+    const c = (j.lo + j.hi) / 2, hh = (j.hi - j.lo) * s / 2, lo = c - hh, hi = c + hh;
+    const lt = lo + tgt * (hi - lo);
+    if (num / V < lt) { const a = sl.zm - z, dF = (lt * V - num) / a; Fs += dF; FM += dF * sl.zm; num = lt * V; }
+    const x = num / V;
+    xs[k] = x;
+    if (x > hi + 1e-9 && ok) { ok = false; why = { type: 'ecc', z }; }
+    const Hz = Fs + dir * alpha * V;
+    if (Math.abs(Hz) > mu * V + 1e-9 && ok) { ok = false; why = { type: 'slide', z }; }
+    const d = Math.min(x - lo, hi - x);
+    if (d > 0 && x > 0 && s === 1) sigMax = Math.max(sigMax, V / (x * 2 * d) / 1000); // MPa
+    Fmax = Math.max(Fmax, Fs);
+  }
+  return { ok, why, xs, sigMax, V, Fs: Fmax };
+}
+
+function bisect(f, lo, hi, it = 32) { for (let i = 0; i < it; i++) { const m = (lo + hi) / 2; if (f(m)) lo = m; else hi = m; } return lo; }
+
+function analyzeTrullo(T, rec = 0, full = true) {
+  const G = trulloGeom(T, rec);
+  const st = solveLune(G, 1, 0, 1, T.mu);
+  let gsf;
+  if (!st.ok) gsf = 0;
+  else if (solveLune(G, 0.02, 0, 1, T.mu).ok) gsf = 50;
+  else { const sMin = 1 - bisect(u => !solveLune(G, 1 - u, 0, 1, T.mu).ok ? false : true, 0, 0.98); gsf = 1 / sMin; }
+  if (!full) return { G, gsf };
+  const aOf = dir => solveLune(G, 1, 0, dir, T.mu).ok ? bisect(a => solveLune(G, 1, a, dir, T.mu).ok, 0, 1.5) : 0;
+  const aOut = aOf(1), aIn = aOf(-1);
+  let Wtot = 0; G.sl.forEach(s => Wtot += s.w); Wtot *= 2 * Math.PI;
+  const Abase = Math.PI * (G.Re ** 2 - T.Ri ** 2);
+  const lim = (dir, a) => solveLune(G, 1, a * 1.002 + 1e-4, dir, T.mu).why;
+  // tensioni: soluzione equilibrata con risultante lontana dai bordi (più compressione anulare, se ammissibile)
+  let sigMax = st.sigMax;
+  for (const tg of [0.3, 0.2, 0.1]) { const r = solveLune(G, 1, 0, 1, T.mu, tg); if (r.ok) { sigMax = r.sigMax; break; } }
+  return { G, st, gsf, aOut, aIn, alpha: Math.min(aOut, aIn), whyOut: lim(1, aOut), whyIn: lim(-1, aIn), Wtot, sigBase: Wtot / Abase / 1000, sigMax };
+}
+
+/* ---------------- CASA ---------------- */
+function analyzeHouse(H) {
+  const Ls = H.L + H.t;                          // luce tra gli assi dei muri
+  const As = H.nb * Math.PI * H.phi ** 2 / 4;      // mm² per travetto
+  const d = H.hs * 1000 - H.cov - H.phi / 2;       // mm
+  const MR = As * H.fyk * 0.9 * d / 1e6;           // kNm
+  const qk = H.G1 + H.G2 + H.Q, ME = qk * 0.5 * Ls * Ls / 8;
+  const lam0 = MR / ME;
+  const ti = (H.cov / H.k) ** 2;
+  const lamAt = t => { const P = t > ti ? 0.0116 * H.ic * (t - ti) : 0; const ph = Math.max(0, H.phi - 2 * P); return lam0 * (ph / H.phi) ** 2; };
+  let tFail = null; for (let t = 0; t <= 1000; t += 0.5) if (lamAt(t) < 1) { tFail = t; break; }
+  // pesi
+  const Wslab = (H.G1 + H.G2) * (H.L + 2 * H.t) ** 2;   // sisma: ψ2 = 0 in copertura
+  const Pc = 4 * Ls, Aw = Pc * H.t;                       // area muri in pianta [m²]
+  const Wwall = Aw * H.h * H.g * (1 - 0.6 * H.op);
+  const W = Wslab + Wwall;
+  const sig0 = (Wslab + 0.5 * Wwall) / (Aw * (1 - H.op)) / 1000; // MPa
+  const sigBase = W / (Aw * (1 - H.op)) / 1000;
+  const Adir = 2 * (H.L + 2 * H.t) * (1 - H.op) * H.t;
+  const VR = Adir * 1000 * 1.5 * H.tau * Math.sqrt(1 + sig0 / (1.5 * H.tau)); // kN
+  const aGlob = VR / W;
+  const N = (H.G1 + H.G2) * Ls / 2, Ww = H.t * H.h * H.g;   // per metro di parete portante
+  const aOver = (Ww * H.t / 2 + N * 2 * H.t / 3) / (Ww * H.h / 2 + N * H.h);
+  const aFlex = 4 * (H.t / H.h) * (1 + 2 * N / Ww);
+  const aOop = H.cord ? aFlex : aOver;
+  return { Ls, As, d, MR, ME, lam0, ti, lamAt, tFail, W, sig0, sigBase, lamCrush: H.fm / sigBase, VR, aGlob, aOver, aFlex, aOop, alpha: Math.min(aGlob, aOop), gov: aGlob <= aOop ? 'glob' : 'oop' };
+}
+
+
+
+/* ---------- dati del confronto ---------- */
+const TRULLO = { Ri: 2.5, s: 1.6, hw: 2.2, hi: 6.0, he: 7.5, p: 1.6, th: 0.9, fill: false, g: 21, mu: 0.65, fm: 2.0 };
+const L = Math.sqrt(Math.PI) * TRULLO.Ri;          // stessa superficie interna
+const SLAB = { hs: 0.24, G1: 3.2, G2: 2.0, Q: 1.0, nb: 2, phi: 10, fyk: 450 };
+const SCEN = {
+  trad: { name: 'Casa in tufo anni \'60–\'80', sub: 'Muri in tufo, solaio in laterocemento, muri non collegati al solaio',
+    note: 'La casa pugliese più diffusa: muri in tufo e solaio in laterocemento appoggiato, senza cordolo di collegamento.',
+    H: { L, t: 0.30, h: 3.0, fm: 1.9, tau: 0.035, g: 16, op: 0.25, cord: false, cov: 20, k: 5, ic: 0.5, ...SLAB } },
+  cord: { name: 'Casa in tufo con cordolo', sub: 'Muri in tufo, solaio in laterocemento con cordolo in c.a.',
+    note: 'Stessa casa in tufo, ma con un cordolo in cemento armato che lega i muri al solaio.',
+    H: { L, t: 0.30, h: 3.0, fm: 1.9, tau: 0.035, g: 16, op: 0.25, cord: true, cov: 20, k: 5, ic: 0.5, ...SLAB } },
+  mod: { name: 'Casa nuova antisismica', sub: 'Blocchi in laterizio, cordoli, calcestruzzo di qualità',
+    note: 'Una casa nuova progettata secondo le norme antisismiche attuali (NTC 2018), con copriferro e calcestruzzo migliori.',
+    H: { L, t: 0.30, h: 3.0, fm: 6.5, tau: 0.125, g: 15, op: 0.25, cord: true, cov: 30, k: 3, ic: 0.3, ...SLAB } },
+};
+const SEIS = { S: 1.0, F0: 2.5, q: 2.0, FC: 1.35 }, AG_REF = 0.06;
+const toAg = a => a * SEIS.q / (SEIS.S * SEIS.F0 * SEIS.FC);
+
+// Trullo: valore centrale + fascia (attrito e spessori un po' peggiori / migliori)
+const TR = analyzeTrullo(TRULLO, 0, true);
+const TRlo = analyzeTrullo({ ...TRULLO, mu: 0.6, s: 1.5, th: 0.85 }, 0, true);
+const TRhi = analyzeTrullo({ ...TRULLO, mu: 0.7, s: 1.7, th: 0.95 }, 0, true);
+const trCap = toAg(TR.alpha), trCapLo = toAg(TRlo.alpha), trCapHi = toAg(TRhi.alpha);
+const trCrush = TRULLO.fm / TR.sigMax;
+const trTime = []; for (let t = 0; t <= 200; t += 25) trTime.push(Math.min(100, 100 * analyzeTrullo(TRULLO, 0.03 * t / 1000, false).gsf / TR.gsf));
+const trHealth = t => { const i = Math.min(7, Math.floor(t / 25)), f = (t - i * 25) / 25; return trTime[i] + (trTime[Math.min(8, i + 1)] - trTime[i]) * f; };
+
+let scen = 'trad', HR, HRlo, HRhi, hCap, hCapLo, hCapHi, tFail, tFailLo, tFailHi;
+function computeHouse() {
+  const H = SCEN[scen].H;
+  HR = analyzeHouse(H);
+  HRlo = analyzeHouse({ ...H, tau: H.tau * 0.8, ic: H.ic * 2 });
+  HRhi = analyzeHouse({ ...H, tau: H.tau * 1.2, ic: H.ic * 0.5 });
+  hCap = toAg(HR.alpha); hCapLo = toAg(HRlo.alpha); hCapHi = toAg(HRhi.alpha);
+  tFail = HR.tFail; tFailLo = HRlo.tFail; tFailHi = HRhi.tFail;
+}
+
+/* ---------- disegni ---------- */
+function trulloSVG(id) {
+  let courses = ''; for (let y = 52; y < 150; y += 9) courses += `<line x1="0" x2="300" y1="${y}" y2="${y}" stroke="var(--cone2)" stroke-width="1.2"/>`;
+  return `<svg viewBox="0 0 300 250" role="img" aria-label="Trullo">
+    <defs><clipPath id="cc${id}"><polygon points="58,150 242,150 150,34"/></clipPath></defs>
+    <ellipse cx="150" cy="232" rx="125" ry="7" fill="rgba(0,0,0,.08)"/>
+    <g class="body">
+      <rect x="66" y="146" width="168" height="86" rx="3" fill="var(--lime)" stroke="#d8d2c4"/>
+      <rect x="66" y="146" width="168" height="86" rx="3" fill="#8d8471" opacity="0" class="fx" data-age="wall"/>
+      <polygon points="58,150 242,150 150,34" fill="var(--cone)"/>
+      <g clip-path="url(#cc${id})">${courses}</g>
+      <polygon points="58,150 242,150 150,34" fill="#3b3a35" opacity="0" class="fx" data-age="cone"/>
+      <g class="fx" opacity="0" data-age="moss"><circle cx="108" cy="132" r="3" fill="#7d8f55"/><circle cx="196" cy="128" r="2.5" fill="#7d8f55"/><circle cx="170" cy="96" r="2" fill="#7d8f55"/><circle cx="122" cy="110" r="2" fill="#7d8f55"/></g>
+      <rect x="146" y="22" width="8" height="14" fill="var(--lime)" stroke="#d8d2c4"/><circle cx="150" cy="17" r="7" fill="var(--lime)" stroke="#d8d2c4"/>
+      <path d="M134 232 v-34 a16 16 0 0 1 32 0 v34z" fill="#5a4636"/>
+      <g class="fx" opacity="0" data-fail="1"><path d="M150 40 L142 70 L152 92 L139 124 L146 150" fill="none" stroke="#2a2622" stroke-width="2.5"/><path d="M96 160 l10 22 -6 18 10 22" fill="none" stroke="#2a2622" stroke-width="2"/><rect x="198" y="118" width="16" height="7" fill="var(--cone)" transform="rotate(25 206 121)"/><rect x="222" y="214" width="16" height="8" fill="var(--cone)" transform="rotate(-12 230 218)"/></g>
+    </g></svg>`;
+}
+function houseSVG(id) {
+  return `<svg viewBox="0 0 300 250" role="img" aria-label="Casa con solaio">
+    <ellipse cx="150" cy="232" rx="125" ry="7" fill="rgba(0,0,0,.08)"/>
+    <g class="body">
+      <g class="fx" data-wall="l" style="transform-origin:62px 232px"><rect x="62" y="118" width="22" height="114" fill="var(--tufo)" stroke="var(--tufo2)"/></g>
+      <g class="fx" data-wall="r" style="transform-origin:238px 232px"><rect x="216" y="118" width="22" height="114" fill="var(--tufo)" stroke="var(--tufo2)"/></g>
+      <rect x="84" y="118" width="132" height="114" fill="var(--tufo)" stroke="var(--tufo2)"/>
+      <rect x="104" y="146" width="34" height="34" fill="#6c7a86" stroke="#f3eee4" stroke-width="3"/>
+      <rect x="160" y="170" width="30" height="62" fill="#5a4636"/>
+      <g class="fx" data-slab="1" style="transform-origin:150px 112px"><rect x="54" y="104" width="192" height="16" fill="var(--cls)" stroke="#9c9890"/>
+        <g class="fx" opacity="0" data-age="spall"><rect x="90" y="116" width="26" height="4" fill="#7b6f63"/><rect x="170" y="116" width="34" height="4" fill="#7b6f63"/><line x1="90" x2="116" y1="118" y2="118" stroke="var(--rust)" stroke-width="2"/><line x1="170" x2="204" y1="118" y2="118" stroke="var(--rust)" stroke-width="2"/></g></g>
+      <g class="fx" opacity="0" data-age="rust"><path d="M98 120 v14 M112 120 v9 M176 120 v16 M196 120 v10 M60 120 v12 M240 120 v8" stroke="var(--rust)" stroke-width="2.5" stroke-linecap="round" opacity=".75"/></g>
+      <g class="fx" opacity="0" data-age="crack"><path d="M84 122 l12 14 -4 10 10 12" fill="none" stroke="#3c332b" stroke-width="2"/><path d="M216 122 l-10 12 5 9 -9 14" fill="none" stroke="#3c332b" stroke-width="2"/><path d="M140 104 l4 8 -3 8" fill="none" stroke="#3c332b" stroke-width="1.8"/></g>
+      <g class="fx" opacity="0" data-fail="1"><path d="M92 128 L132 190 M132 128 L92 190 M172 126 L212 186 M212 126 L172 186" stroke="#2a2622" stroke-width="2.6"/></g>
+    </g></svg>`;
+}
+function sectionSVG() {
+  const G = TR.G, T = G.T, sc = 30, w = (2 * G.Re + 1) * sc, h = (T.he + 0.8) * sc, cx = w / 2, by = h - 0.4 * sc;
+  const X = r => cx + r * sc, Y = z => by - z * sc;
+  const mir = pts => 'M' + pts.map(([r, z]) => `${X(r).toFixed(1)},${Y(z).toFixed(1)}`).join('L') + 'L' + pts.slice().reverse().map(([r, z]) => `${X(-r).toFixed(1)},${Y(z).toFixed(1)}`).join('L') + 'Z';
+  const out = [], inn = []; for (let i = 0; i <= 100; i++) { const z = T.he * i / 100; if (G.rout(z) > 0 || i === 100) out.push([G.rout(z), z]); const zi = T.hi * i / 100; inn.push([G.rin(zi), zi]); }
+  const band = side => { const a = [], b = []; for (let i = 0; i <= 100; i++) { const z = T.hi * i / 100, [lo, hi] = G.band(z); a.push(`${X(side * lo).toFixed(1)},${Y(z).toFixed(1)}`); b.push(`${X(side * hi).toFixed(1)},${Y(z).toFixed(1)}`); } return 'M' + a.join('L') + 'L' + b.reverse().join('L') + 'Z'; };
+  const st = solveLune(G, 1, 0, 1, T.mu, 0.3).ok ? solveLune(G, 1, 0, 1, T.mu, 0.3) : TR.st;
+  const line = side => { const p = []; for (let k = NS - 1; k >= 0; k--) if (st.xs[k] !== null && G.jt[k].check) p.push(`${X(side * st.xs[k]).toFixed(1)},${Y(G.jt[k].z).toFixed(1)}`); return 'M' + p.join('L'); };
+  let rings = ''; for (let z = T.hw + 0.5; z < T.hi - 0.3; z += 0.75) { const r = G.rin(z); rings += `<path d="M${X(-r)},${Y(z)} L${X(-r) + 9},${Y(z)} M${X(r)},${Y(z)} L${X(r) - 9},${Y(z)}" stroke="var(--house)" stroke-width="2.2" stroke-linecap="round"/>`; }
+  return `<svg viewBox="0 0 ${w.toFixed(0)} ${h.toFixed(0)}" role="img" aria-label="Sezione del trullo con il percorso dei carichi">
+    <line x1="0" x2="${w}" y1="${by}" y2="${by}" stroke="#bdb4a4"/>
+    <path d="${mir(out)} ${mir(inn)}" fill-rule="evenodd" fill="#e7dfcf" stroke="#bdb4a4"/>
+    <path d="${band(1)}" fill="#cdbf9f"/><path d="${band(-1)}" fill="#cdbf9f"/>
+    ${rings}
+    <path d="${line(1)}" class="flow" fill="none" stroke="var(--trullo)" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="${line(-1)}" class="flow" fill="none" stroke="var(--trullo)" stroke-width="3.2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ---------- 1 · tempo ---------- */
+function stateLabel(p, thr) {
+  if (p >= 99.5) return ['Integro', 'var(--good)'];
+  if (p > thr + 15) return ['Corrosione dei ferri in corso', 'var(--warn)'];
+  if (p > thr) return ['Degrado avanzato', 'var(--bad)'];
+  return ['Rischio crollo del solaio', 'var(--bad)'];
+}
+function setAge(root, sel, v) { root.querySelectorAll(`[data-age="${sel}"]`).forEach(e => e.setAttribute('opacity', v.toFixed(2))); }
+function updTime() {
+  const t = +$('yr').value; $('yrs').textContent = t + ' anni';
+  const pT = trHealth(t), pH = 100 * HR.lamAt(t) / HR.lam0, thr = 100 / HR.lam0;
+  $('mT').style.width = pT + '%'; $('mT').style.background = 'var(--trullo)';
+  const [lab, col] = stateLabel(pH, thr);
+  $('mH').style.width = Math.max(0, pH) + '%'; $('mH').style.background = col;
+  $('sT').innerHTML = `${fmt(pT)}% della resistenza iniziale <small>· ${t < 60 ? 'integro' : 'serve solo rifare le chiancarelle e l\'imbiancatura'}</small>`;
+  $('sH').innerHTML = `<span style="color:${col}">${fmt(pH)}% · ${lab}</span>`;
+  const tr = $('tT'), hh = $('tH');
+  setAge(tr, 'cone', Math.min(.35, t / 200 * .35)); setAge(tr, 'wall', Math.min(.25, t / 200 * .25)); setAge(tr, 'moss', t > 60 ? Math.min(1, (t - 60) / 80) : 0);
+  const after = t - HR.ti;
+  setAge(hh, 'rust', after > 0 ? Math.min(1, after / 30) : 0);
+  setAge(hh, 'spall', pH < 90 ? Math.min(1, (90 - pH) / 10) : 0);
+  setAge(hh, 'crack', pH < thr + 15 ? Math.min(1, (thr + 15 - pH) / 10) : 0);
+  const sl = hh.querySelector('[data-slab]'); sl.style.transform = pH < thr ? 'translateY(5px) scaleY(1.15)' : '';
+}
+function factsTime() {
+  const rng = (a, b) => (a === null && b === null) ? 'oltre 1000 anni' : `tra ${a === null ? '1000+' : fmt(a)} e ${b === null ? '1000+' : fmt(b)} anni`;
+  $('factsTime').innerHTML = `
+    <div class="fact t"><div class="k">Trullo</div><div class="v">Nessun ferro</div><div class="s">Senza armature non c'è nulla che arrugginisca. La pietra calcarea si consuma di pochi millimetri in due secoli.</div></div>
+    <div class="fact h"><div class="k">Casa · inizio corrosione</div><div class="v">~${fmt(HR.ti)} anni</div><div class="s">L'aria carbonata attraversa i ${SCEN[scen].H.cov} mm di copriferro e i ferri del solaio iniziano ad arrugginire.</div></div>
+    <div class="fact h"><div class="k">Casa · solaio a fine vita</div><div class="v">${tFail === null ? '> 1000 anni' : '~' + fmt(tFail) + ' anni'}</div><div class="s">Senza interventi. A seconda dell'umidità: ${rng(tFailLo, tFailHi)}.</div></div>`;
+}
+
+/* ---------- 2 · sisma ---------- */
+const level = a => a < 0.08 ? 'lieve' : a < 0.18 ? 'moderata' : a < 0.35 ? 'forte' : a < 0.55 ? 'molto forte' : 'estrema';
+function updEq() {
+  const a = +$('eq').value;
+  $('eqv').innerHTML = `${level(a)} <span style="font-size:15px;font-family:Inter;font-weight:500;color:var(--ink2)">· ${fmt(a / AG_REF, 1)}× il terremoto di riferimento della Murgia</span>`;
+}
+function resetEq() {
+  ['eT', 'eH'].forEach(id => { const r = $(id); r.querySelectorAll('[data-fail]').forEach(e => e.setAttribute('opacity', 0)); r.querySelectorAll('[data-wall]').forEach(e => e.style.transform = ''); const s = r.querySelector('[data-slab]'); if (s) s.style.transform = ''; });
+  $('oT').innerHTML = $('oH').innerHTML = '&nbsp;';
+}
+function verdict(a, cap) {
+  const m = cap / a;
+  if (m >= 1.5) return `<span class="ok">Regge · margine ${fmt(m, 1)}×</span>`;
+  if (m >= 1) return `<span class="mid">Regge, al limite (${fmt(m, 1)}×)</span>`;
+  return `<span class="ko">Danni gravi / crollo</span>`;
+}
+function shake() {
+  resetEq();
+  const a = +$('eq').value, amp = Math.min(16, 2 + a * 22) + 'px';
+  const bt = $('shake'); bt.disabled = true;
+  [$('eT'), $('eH')].forEach(el => { el.style.setProperty('--amp', amp); el.classList.remove('shaking'); void el.offsetWidth; el.classList.add('shaking'); });
+  setTimeout(() => {
+    bt.disabled = false;
+    $('oT').innerHTML = verdict(a, trCap);
+    $('oH').innerHTML = verdict(a, hCap);
+    if (a > trCap) $('eT').querySelector('[data-fail]').setAttribute('opacity', 1);
+    if (a > hCap) {
+      const H = SCEN[scen].H;
+      if (HR.gov === 'oop' && !H.cord) { $('eH').querySelector('[data-wall="r"]').style.transform = 'rotate(14deg)'; $('eH').querySelector('[data-slab]').style.transform = 'translate(4px,14px) rotate(6deg)'; }
+      else $('eH').querySelector('[data-fail]').setAttribute('opacity', 1);
+    }
+  }, 1650);
+}
+function factsEq() {
+  const H = SCEN[scen].H, mech = HR.gov === 'oop' && !H.cord ? 'i muri, non legati al solaio, si ribaltano verso l\'esterno' : 'i muri si fessurano a taglio';
+  const r = trCap / hCap;
+  const cmp = r > 1.15 ? `Il trullo resiste a una scossa <b>${fmt(r, 1)} volte</b> più forte.` : r < 0.87 ? `Qui la casa resiste di più: è progettata apposta per il sisma, con muri e collegamenti dimensionati da calcolo.` : `Le due costruzioni sono sostanzialmente equivalenti.`;
+  $('factsEq').innerHTML = `
+    <div class="fact t"><div class="k">Trullo · cede oltre</div><div class="v">${fmt(trCap / AG_REF, 1)}× il riferimento</div><div class="s">Fascia ${fmt(trCapLo / AG_REF, 1)}–${fmt(trCapHi / AG_REF, 1)}×. Muri spessi ${fmt(TRULLO.s * 100)} cm, forma compatta e simmetrica, nessun collegamento che possa staccarsi.</div></div>
+    <div class="fact h"><div class="k">Casa · cede oltre</div><div class="v">${fmt(hCap / AG_REF, 1)}× il riferimento</div><div class="s">${fmt(hCapLo / AG_REF, 1) === fmt(hCapHi / AG_REF, 1) ? '' : `Fascia ${fmt(hCapLo / AG_REF, 1)}–${fmt(hCapHi / AG_REF, 1)}×. `}Il punto debole: ${mech}.</div></div>
+    <div class="fact"><div class="k">Confronto</div><div class="v" style="font-size:19px">${r > 1.15 ? 'Vince il trullo' : r < 0.87 ? 'Vince la casa' : 'Pari'}</div><div class="s">${cmp}</div></div>`;
+}
+
+/* ---------- 3 · statica ---------- */
+function statics() {
+  $('sec').innerHTML = sectionSVG();
+  $('bullets').innerHTML = `
+    <li><b>Il peso scende lungo la linea blu</b>, che resta sempre dentro la pietra: nessuna parte del trullo è tirata, tutto è compresso. È così che stanno in piedi gli archi e le cupole da millenni.</li>
+    <li><b>Ogni filare è un anello</b> (trattini arancioni): stringendosi su sé stesso impedisce alle pietre di cadere verso l'interno, anche senza malta.</li>
+    <li><b>Le pietre lavorano a 1/${fmt(trCrush)}</b> di quello che possono reggere. Il solaio di una casa, invece, è dimensionato con una riserva di circa ${fmt(HR.lam0, 1)} volte il carico.</li>
+    <li><b>${fmt(TR.Wtot / 9.81)} tonnellate di pietra</b> per ${fmt(Math.PI * TRULLO.Ri ** 2)} m² interni: una massa che dà stabilità e anche inerzia termica, cioè fresco d'estate e tepore d'inverno.</li>`;
+}
+
+/* ---------- riepilogo ---------- */
+function summary() {
+  const r = trCap / hCap;
+  const tag = (c, t) => `<span class="tag ${c}">${t}</span>`;
+  const eqTxt = r > 1.15 ? `${tag('w', 'Trullo')}Regge una scossa ${fmt(r, 1)} volte più forte di questa casa.` : r < 0.87 ? `${tag('l', 'Casa nuova')}Una casa antisismica nuova resiste di più. Il trullo resta comunque ${fmt(trCap / AG_REF, 1)} volte sopra il terremoto di riferimento della zona.` : `${tag('p', 'Pari')}Resistenza simile. Il trullo non ha però collegamenti in acciaio che possano degradarsi.`;
+  $('sum').innerHTML = `
+    <div class="srow"><b>Durata</b><span>${tag('w', 'Trullo')}Nessun ferro da corrodere. Il solaio in cemento armato inizia a degradarsi dopo circa ${fmt(HR.ti)} anni${tFail !== null ? ` e senza interventi arriva a fine vita intorno ai ${fmt(tFail)} anni` : ''}.</span></div>
+    <div class="srow"><b>Terremoto</b><span>${eqTxt}</span></div>
+    <div class="srow"><b>Peso e carichi</b><span>${tag('w', 'Trullo')}La pietra lavora a 1/${fmt(trCrush)} della sua resistenza. Il solaio ha una riserva di ${fmt(HR.lam0, 1)} volte.</span></div>`;
+}
+
+function render() {
+  computeHouse();
+  $('picknote').textContent = SCEN[scen].note;
+  $('hSub').textContent = SCEN[scen].sub;
+  $('tT').innerHTML = trulloSVG('a'); $('tH').innerHTML = houseSVG('a');
+  $('eT').innerHTML = trulloSVG('b'); $('eH').innerHTML = houseSVG('b');
+  updTime(); factsTime(); updEq(); factsEq(); statics(); summary();
+}
+$('pick').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; scen = b.dataset.s; $('pick').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); render(); });
+$('yr').addEventListener('input', updTime);
+$('eq').addEventListener('input', () => { updEq(); resetEq(); });
+$('shake').addEventListener('click', shake);
+render();
+</script>
+</body>
+</html>
